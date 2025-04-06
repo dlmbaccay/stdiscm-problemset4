@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: discovery-server
+
+eureka:
+  client:
+    registerWithEureka: false  # Eureka Server doesn't register with itself
+    fetchRegistry: false       # Eureka Server doesn't fetch registry from another server
+  server:
+    enable-self-preservation: false  # Disable self-preservation for testing purposes
+
+server:
+  port: 8761  # Default port for Eureka Server
