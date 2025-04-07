@@ -21,6 +21,7 @@ public class MessageService {
      * @param message the message to send
      */
     public void sendToAuthService(Object message) {
+        System.out.println("Sending message to auth service: " + message);
         rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE, "auth.message", message);
     }
 
