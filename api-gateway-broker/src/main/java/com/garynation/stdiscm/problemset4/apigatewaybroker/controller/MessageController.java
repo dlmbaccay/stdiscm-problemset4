@@ -1,4 +1,4 @@
-package com.garynation.api_gateway.controller;
+package com.garynation.stdiscm.problemset4.apigatewaybroker.controller;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.garynation.api_gateway.service.MessageService;
+import jakarta.servlet.http.HttpServletRequest;
+
+import com.garynation.stdiscm.problemset4.apigatewaybroker.service.MessageService;
 
 @RestController
 @RequestMapping("/api/messages")
@@ -33,7 +35,9 @@ public class MessageController {
     }
 
     @PostMapping("/courses")
-    public ResponseEntity<Map<String, String>> sendToCourseService(@RequestBody Map<String, Object> message) {
+    public ResponseEntity<Map<String, String>> sendToCourseService(@RequestBody Map<String, Object> message, HttpServletRequest request) {
+        message.put("username", request.getAttribute("username"));
+        
         messageService.sendToCourseService(message);
         
         Map<String, String> response = new HashMap<>();
@@ -42,7 +46,9 @@ public class MessageController {
     }
 
     @PostMapping("/enrollment")
-    public ResponseEntity<Map<String, String>> sendToEnrollmentService(@RequestBody Map<String, Object> message) {
+    public ResponseEntity<Map<String, String>> sendToEnrollmentService(@RequestBody Map<String, Object> message, HttpServletRequest request) {
+        message.put("username", request.getAttribute("username"));
+        
         messageService.sendToEnrollmentService(message);
         
         Map<String, String> response = new HashMap<>();
@@ -51,7 +57,9 @@ public class MessageController {
     }
 
     @PostMapping("/grades")
-    public ResponseEntity<Map<String, String>> sendToGradeService(@RequestBody Map<String, Object> message) {
+    public ResponseEntity<Map<String, String>> sendToGradeService(@RequestBody Map<String, Object> message, HttpServletRequest request) {
+        message.put("username", request.getAttribute("username"));
+        
         messageService.sendToGradeService(message);
         
         Map<String, String> response = new HashMap<>();

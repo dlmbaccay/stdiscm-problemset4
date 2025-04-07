@@ -1,30 +1,31 @@
 package com.garynation.stdiscm.problemset4.auth_service.controller;
 
-import com.garynation.stdiscm.problemset4.auth_service.dto.UserDto;
-import com.garynation.stdiscm.problemset4.auth_service.entity.User;
-import com.garynation.stdiscm.problemset4.auth_service.repository.UserRepository;
-import com.garynation.stdiscm.problemset4.auth_service.security.JwtUtil;
-import com.garynation.stdiscm.problemset4.auth_service.service.UserService;
-import lombok.AllArgsConstructor;
+import java.util.List;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.token.Token;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.UUID;
+import com.garynation.stdiscm.problemset4.auth_service.dto.UserDto;
+import com.garynation.stdiscm.problemset4.auth_service.repository.UserRepository;
+import com.garynation.stdiscm.problemset4.auth_service.security.JwtUtil;
+import com.garynation.stdiscm.problemset4.auth_service.service.UserService;
+
+import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/auth")
 public class UserController {
     private UserService userService;
+    private JwtUtil jwtUtil;
 
 
 
@@ -61,7 +62,7 @@ public class UserController {
     PasswordEncoder encoder;
     @Autowired
     JwtUtil jwtUtils;
-    @PostMapping("/signin")
+    @PostMapping("/login")
     public ResponseEntity<String> authenticateUser(@RequestBody UserDto userDto) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -78,6 +79,11 @@ public class UserController {
         userDto.setPassword(encoder.encode(userDto.getPassword()));
         UserDto user = userService.createUser(userDto);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
+    }
+    @GetMapping("/validate")
+    public ResponseEntity<Boolean> validateUser(@RequestHeader("Authorization") String token) {
+       boolean isValid = jwtUtil.validateJwtToken(token);
+       return new ResponseEntity<>(isValid, HttpStatus.OK);
     }
 
 

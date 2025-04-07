@@ -1,7 +1,6 @@
 package com.garynation.stdiscm.problemset4.gradeservice.controller;
 
 import com.garynation.stdiscm.problemset4.gradeservice.dto.GradeDto;
-import com.garynation.stdiscm.problemset4.gradeservice.entity.Grade;
 import com.garynation.stdiscm.problemset4.gradeservice.service.GradeService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,7 +30,7 @@ public class GradeController {
 
     @DeleteMapping("{id}")
     public ResponseEntity<String> deleteGrade(@PathVariable("id") UUID id) {
-        GradeDto grade = gradeService.deleteGrade(id);
+        gradeService.deleteGrade(id);
         return ResponseEntity.ok("Grade deleted successfully.");
     }
 

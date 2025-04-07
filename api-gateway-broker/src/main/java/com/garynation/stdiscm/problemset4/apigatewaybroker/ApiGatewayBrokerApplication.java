@@ -1,4 +1,4 @@
-package com.garynation.stdiscm.problemset4.auth_service;
+package com.garynation.stdiscm.problemset4.apigatewaybroker;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -6,10 +6,10 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-public class AuthServiceApplication {
+public class ApiGatewayBrokerApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(AuthServiceApplication.class, args);
+		SpringApplication.run(ApiGatewayBrokerApplication.class, args);
 	}
 
 }

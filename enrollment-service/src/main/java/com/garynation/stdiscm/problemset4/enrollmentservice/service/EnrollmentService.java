@@ -1,10 +1,9 @@
 package com.garynation.stdiscm.problemset4.enrollmentservice.service;
 
-import com.garynation.stdiscm.problemset4.enrollmentservice.dto.CourseDto;
-import com.garynation.stdiscm.problemset4.enrollmentservice.dto.EnrollmentDto;
-
 import java.util.List;
 import java.util.UUID;
+
+import com.garynation.stdiscm.problemset4.enrollmentservice.dto.EnrollmentDto;
 
 public interface EnrollmentService {
     EnrollmentDto addEnrollment(EnrollmentDto enrollmentDto);
