@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 
 import com.garynation.stdiscm.problemset4.auth_service.dto.RefreshDto;
 import com.garynation.stdiscm.problemset4.auth_service.dto.UserDto;
+import com.garynation.stdiscm.problemset4.auth_service.dto.UserLoginDto;
+import com.garynation.stdiscm.problemset4.auth_service.dto.UserWithTokenDto;
 import com.garynation.stdiscm.problemset4.auth_service.repository.UserRepository;
 import com.garynation.stdiscm.problemset4.auth_service.security.JwtUtil;
 import com.garynation.stdiscm.problemset4.auth_service.service.UserService;
@@ -33,6 +35,12 @@ public class UserController {
     public ResponseEntity<UserDto> getUserById(@PathVariable("id") UUID userId) {
 
         UserDto user = userService.getUserById(userId);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    @GetMapping("/email/{email}")
+    public ResponseEntity<UserDto> getUserByEmail(@PathVariable("email") String email) {
+        UserDto user = userService.getUserByEmail(email);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
@@ -67,18 +75,29 @@ public class UserController {
     JwtUtil jwtUtils;
     @Operation(summary = "Authenticate user")
     @PostMapping("/login")
-    public ResponseEntity<String> authenticateUser(@RequestBody UserDto userDto) {
+    public ResponseEntity<UserWithTokenDto> authenticateUser(@RequestBody UserLoginDto userLoginDto) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        userDto.getEmail(),
-                        userDto.getPassword()
-                )
+            new UsernamePasswordAuthenticationToken(
+                userLoginDto.getEmail(),
+                userLoginDto.getPassword()
+            )
         );
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String token = jwtUtils.generateToken(userDetails.getUsername());
-        return new ResponseEntity<>(token, HttpStatus.OK);
+        
+        UserDto user = userService.getUserByEmail(userDetails.getUsername());
+        UserWithTokenDto userWithTokenDto = new UserWithTokenDto(
+            user.getId(),
+            user.getFirstName(),
+            user.getLastName(),
+            user.getEmail(),
+            user.getRole(),
+            token
+        );
+    
+        return new ResponseEntity<>(userWithTokenDto, HttpStatus.OK);
     }
-    @Operation(summary = "Create user")
+    @Operation(summary = "Create user, omit id")
     @PostMapping("/register")
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
         userDto.setPassword(encoder.encode(userDto.getPassword()));

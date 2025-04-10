@@ -8,4 +8,4 @@ eureka:
       defaultZone: http://localhost:8761/eureka  # Eureka Server URL
 
 server:
-  port: 8082  # Port for Frontend Service
+  port: 8080  # Port for Frontend Service
