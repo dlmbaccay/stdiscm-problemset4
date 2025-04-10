@@ -1,14 +1,11 @@
 package com.garynation.stdiscm.problemset4.auth_service.dto;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
+import java.util.UUID;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.sql.Date;
-import java.util.UUID;
 
 @Getter
 @Setter

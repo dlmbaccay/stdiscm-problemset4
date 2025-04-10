@@ -1,0 +1,49 @@
+spring:
+    application:
+        name: api-gateway
+    # RabbitMQ Configuration
+    rabbitmq:
+        host: localhost
+        port: 5672
+        username: guest
+        password: guest
+    cloud:
+        discovery:
+            locator:
+                enabled: true
+
+springdoc:
+    api-docs:
+        enabled: true
+        path: /v3/api-docs
+    swagger-ui:
+        enabled: true
+        config-url: /v3/api-docs/swagger-config
+        urls:
+          - name: api-gateway
+            url: /v3/api-docs
+          - name: auth-service
+            url: /auth/v3/api-docs
+          - name: course-service
+            url: /courses/v3/api-docs
+          - name: enrollment-service
+            url: /enrollment/v3/api-docs
+          - name: grade-service
+            url: /grades/v3/api-docs
+
+
+
+jwt:
+    secret: 61a62b122a559ebd46faf617f2c74c17028af977a90874bf2a99d066672bf437c50dcd0729b1a9627eadc19d1c859dbacc01201f942bf08a4462afcff9fab5298483e4450852f8e854f93023a57f4f91a2d577487b6f8bcfb5eced6028e39aeb45ca3584b1432f93a8d3b2e50998a718e686d9d651fab77c8a7f520a7ad5a1dbd2efba288e485c4598f9ba1b81538541e1024e811814f14c2ff3774ad92861a3f907f61f6a4ee2f8597f127a89e8be29111bcb85db3a39fb430ac32087f94ce8e00315ceb490cd916941c4623eb78b50b044ab5671d6e4b9070145a666537fa112af1f48cd3a509eef9a65f85ae1384a8458a12488f636d7c83471d374a7a46a
+    expiration: 3600000
+
+eureka:
+    client:
+        service-url:
+            defaultZone: http://localhost:8761/eureka # URL of the Eureka Server
+        register-with-eureka: false
+        fetch-registry: false
+        enabled: false # Disable Eureka client completely for local development
+
+server:
+    port: 8081

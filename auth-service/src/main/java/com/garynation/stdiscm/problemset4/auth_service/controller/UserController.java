@@ -13,11 +13,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import com.garynation.stdiscm.problemset4.auth_service.dto.RefreshDto;
 import com.garynation.stdiscm.problemset4.auth_service.dto.UserDto;
 import com.garynation.stdiscm.problemset4.auth_service.repository.UserRepository;
 import com.garynation.stdiscm.problemset4.auth_service.security.JwtUtil;
 import com.garynation.stdiscm.problemset4.auth_service.service.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -25,10 +27,8 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/auth")
 public class UserController {
     private UserService userService;
-    private JwtUtil jwtUtil;
 
-
-
+    @Operation(summary = "Get user by ID")
     @GetMapping("{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable("id") UUID userId) {
 
@@ -36,21 +36,24 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
+    @Operation(summary = "Get all users")
     @GetMapping
     public ResponseEntity<List<UserDto>> getAllUsers() {
         List<UserDto> users = userService.getAllUsers();
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
+    @Operation(summary = "Update user by ID")
     @PutMapping("{id}")
     public ResponseEntity<UserDto> updateUser(@PathVariable("id") UUID userId, @RequestBody UserDto userDto) {
         UserDto user = userService.updateUser(userId, userDto);
         return ResponseEntity.ok(user);
     }
 
+    @Operation(summary = "Delete user by ID")
     @DeleteMapping("{id}")
     public ResponseEntity<String> deleteUser(@PathVariable("id") UUID userId) {
-        UserDto user = userService.deleteUser(userId);
+        userService.deleteUser(userId);
         return ResponseEntity.ok("User deleted succesfully.");
     }
 
@@ -62,6 +65,7 @@ public class UserController {
     PasswordEncoder encoder;
     @Autowired
     JwtUtil jwtUtils;
+    @Operation(summary = "Authenticate user")
     @PostMapping("/login")
     public ResponseEntity<String> authenticateUser(@RequestBody UserDto userDto) {
         Authentication authentication = authenticationManager.authenticate(
@@ -74,17 +78,26 @@ public class UserController {
         String token = jwtUtils.generateToken(userDetails.getUsername());
         return new ResponseEntity<>(token, HttpStatus.OK);
     }
+    @Operation(summary = "Create user")
     @PostMapping("/register")
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
         userDto.setPassword(encoder.encode(userDto.getPassword()));
         UserDto user = userService.createUser(userDto);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
-    @GetMapping("/validate")
-    public ResponseEntity<Boolean> validateUser(@RequestHeader("Authorization") String token) {
-       boolean isValid = jwtUtil.validateJwtToken(token);
-       return new ResponseEntity<>(isValid, HttpStatus.OK);
+
+    @Operation(summary = "Refresh token")
+    @PostMapping("/refresh")
+    public ResponseEntity<String> refreshToken(@RequestBody RefreshDto refreshDto) {
+        // Validate the refresh token
+        if (jwtUtils.validateJwtToken(refreshDto.getRefreshToken())) {
+            // Extract username from the refresh token
+            String username = jwtUtils.getEmailFromToken(refreshDto.getRefreshToken());
+            // Generate a new access token
+            String newAccessToken = jwtUtils.generateToken(username);
+            return new ResponseEntity<>(newAccessToken, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Invalid refresh token", HttpStatus.UNAUTHORIZED);
+        }
     }
-
-
 }

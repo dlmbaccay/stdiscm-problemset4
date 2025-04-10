@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.garynation.stdiscm.problemset4.courseservice.dto.CourseDto;
 import com.garynation.stdiscm.problemset4.courseservice.service.CourseService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -25,6 +26,7 @@ import lombok.AllArgsConstructor;
 public class CourseController {
     private CourseService courseService;
 
+    @Operation(summary = "Create course")
     @PostMapping("create")
     public ResponseEntity<CourseDto> createCourse(@RequestBody CourseDto courseDto) {
         CourseDto course = courseService.createCourse(courseDto);
@@ -32,6 +34,7 @@ public class CourseController {
 
     }
 
+    @Operation(summary = "Get course by id")
     @GetMapping("{id}")
     public ResponseEntity<CourseDto> getCourseById(@PathVariable("id") UUID courseId) {
 
@@ -39,27 +42,31 @@ public class CourseController {
         return new ResponseEntity<>(course, HttpStatus.OK);
     }
 
+    @Operation(summary = "Get all courses")
     @GetMapping
     public ResponseEntity<List<CourseDto>> getAllCourses() {
         List<CourseDto> courses = courseService.getAllCourses();
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 
+    @Operation(summary = "Get course by faculty id")
     @GetMapping("/faculty/{id}")
     public ResponseEntity<CourseDto> getCourseByFacultyId(@PathVariable("id") UUID courseId) {
         CourseDto course = courseService.getCourseById(courseId);
         return new ResponseEntity<>(course, HttpStatus.OK);
     }
 
+    @Operation(summary = "Update course")
     @PutMapping("{id}")
     public ResponseEntity<CourseDto> updateCourse(@PathVariable("id") UUID courseId, @RequestBody CourseDto courseDto) {
         CourseDto course = courseService.updateCourse(courseId, courseDto);
         return new ResponseEntity<>(course, HttpStatus.OK);
     }
 
+    @Operation(summary = "Delete course")
     @DeleteMapping("{id}")
     public ResponseEntity<String> deleteCourse(@PathVariable("id") UUID courseId) {
-        CourseDto course = courseService.deleteCourse(courseId);
+        courseService.deleteCourse(courseId);
         return ResponseEntity.ok("Course deleted succesfully.");
     }
 }
