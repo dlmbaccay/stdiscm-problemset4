@@ -1,12 +1,6 @@
 spring:
     application:
         name: api-gateway
-    # RabbitMQ Configuration
-    rabbitmq:
-        host: localhost
-        port: 5672
-        username: guest
-        password: guest
     cloud:
         gateway:
             globalcors:
@@ -46,7 +40,7 @@ jwt:
 eureka:
     client:
         service-url:
-            defaultZone: http://localhost:8761/eureka # URL of the Eureka Server
+            defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka}
         register-with-eureka: false
         fetch-registry: false
         enabled: false # Disable Eureka client completely for local development

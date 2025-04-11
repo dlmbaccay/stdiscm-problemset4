@@ -14,13 +14,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/login", "/auth/login", "/register", "/auth/register").permitAll()  // Allow public access to login and register pages
-                .anyRequest().authenticated()  // All other requests require authentication
-            )
-            .formLogin(form -> form.loginPage("/login").permitAll())  // Custom login page
-            .logout(logout -> logout.permitAll());  // Enable logout functionality
-            
+            .authorizeHttpRequests(auth -> auth
+                .anyRequest().permitAll()
+            );
         return http.build();
     }
 }

@@ -1,8 +1,6 @@
-package com.garynation.stdiscm.problemset4.auth_service.dto;
+package com.garynation.frontend_service.dto;
 
 import java.util.UUID;
-
-import org.springframework.security.core.userdetails.UserDetails;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,6 +18,5 @@ public class UserWithTokenDto {
     private String email;
     private String role;
     private String token;
-    private UserDetails details;
-
-}
+    private Object userDetails;
+} 

@@ -84,7 +84,7 @@ public class UserController {
         );
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String token = jwtUtils.generateToken(userDetails.getUsername());
-        
+        System.out.println(userDetails);
         UserDto user = userService.getUserByEmail(userDetails.getUsername());
         UserWithTokenDto userWithTokenDto = new UserWithTokenDto(
             user.getId(),
@@ -92,7 +92,8 @@ public class UserController {
             user.getLastName(),
             user.getEmail(),
             user.getRole(),
-            token
+            token,
+            userDetails
         );
     
         return new ResponseEntity<>(userWithTokenDto, HttpStatus.OK);
@@ -118,5 +119,17 @@ public class UserController {
         } else {
             return new ResponseEntity<>("Invalid refresh token", HttpStatus.UNAUTHORIZED);
         }
+    }
+
+    @Operation(summary = "Validate JWT token")
+    @GetMapping("/validate")
+    public ResponseEntity<Void> validateToken(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            if (jwtUtils.validateJwtToken(token)) {
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 }

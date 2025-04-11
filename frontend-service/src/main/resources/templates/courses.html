@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Courses</title>
+        <script src="/js/auth.js"></script>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background: #f8f9fa;
+                margin: 0;
+                padding: 0;
+            }
+
+            header {
+                background-color: #343a40;
+                color: #fff;
+                padding: 1rem 2rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            nav a {
+                margin-left: 1rem;
+                color: #fff;
+                text-decoration: none;
+            }
+
+            h1 {
+                text-align: center;
+                margin-top: 2rem;
+            }
+
+            .courses-container {
+                max-width: 1000px;
+                margin: 2rem auto;
+                padding: 1rem;
+                background: #ffffff;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .course {
+                border: 1px solid #dee2e6;
+                padding: 1rem;
+                border-radius: 6px;
+                margin-bottom: 1rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .course-info {
+                flex: 1;
+            }
+
+            .enroll-btn {
+                background-color: #28a745;
+                color: white;
+                border: none;
+                padding: 0.5rem 1rem;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+
+            .enroll-btn:hover {
+                background-color: #218838;
+            }
+        </style>
+        <script src="/frontend-service/src/main/resources/static/js/auth.js"></script>
+    </head>
+    <body>
+        <header>
+            <div><strong>Courses Page</strong></div>
+            <nav>
+                <a href="/enroll">Enroll</a>
+                <a href="/my-courses">My Courses</a>
+                <a href="/my-grades">My Grades</a>
+                <a href="/logout">Logout</a>
+            </nav>
+        </header>
+
+        <h1>Available Courses</h1>
+
+        <div class="courses-container" id="courses-list">
+            <!-- Courses will be dynamically inserted here -->
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                fetchCourses()
+            })
+
+            function fetchCourses() {
+                fetch('http://localhost:8081/courses') // adjust to your endpoint
+                    .then((response) => response.json())
+                    .then((data) => {
+                        const list = document.getElementById('courses-list')
+                        list.innerHTML = '' // Clear existing
+                        console.log(data)
+
+                        data.forEach((course) => {
+                            const div = document.createElement('div')
+                            div.className = 'course'
+
+                            div.innerHTML = `
+                            <div class="course-info">
+                                <strong>${course.code}: ${course.name}</strong><br>
+                                Faculty: ${course.faculty}<br>
+                                Enrolled: ${course.currentEnrollees}/${course.maxEnrollees}
+                            </div>
+                            <button class="enroll-btn" onclick="enroll('${course.id}')">Enroll</button>
+                        `
+
+                            list.appendChild(div)
+                        })
+                    })
+            }
+
+            function enroll(courseId) {
+                fetch(`http://localhost:8081/enrollment/${courseId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
+                    .then((res) => {
+                        if (res.ok) {
+                            alert('Enrollment successful!')
+                            fetchCourses() // refresh
+                        } else {
+                            res.text().then((msg) => alert('Failed: ' + msg))
+                        }
+                    })
+                    .catch((err) => alert('Error: ' + err))
+            }
+        </script>
+    </body>
+</html>

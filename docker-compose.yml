@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
     db:
         image: postgres:latest
@@ -14,7 +12,7 @@ services:
         volumes:
             - db_data:/var/lib/postgresql/data
         networks:
-            - app-network
+            - stdiscm-network
 
     pgadmin:
         image: dpage/pgadmin4
@@ -28,10 +26,111 @@ services:
         depends_on:
             - db
         networks:
-            - app-network
+            - stdiscm-network
+
+    discovery-server:
+        build: ./discovery-server
+        container_name: discovery-server
+        ports:
+            - '8761:8761'
+        networks:
+            - stdiscm-network
+        environment:
+            - SPRING_PROFILES_ACTIVE=docker
+
+    api-gateway:
+        build: ./api-gateway
+        container_name: api-gateway
+        ports:
+            - '8081:8081'
+        depends_on:
+            - discovery-server
+        networks:
+            - stdiscm-network
+        environment:
+            - SPRING_PROFILES_ACTIVE=docker
+            - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
+            - SPRING_CLOUD_GATEWAY_DISCOVERY_LOCATOR_ENABLED=true
+            - SPRING_CLOUD_GATEWAY_DISCOVERY_LOCATOR_LOWERCASE_SERVICE_ID=true
+
+    auth-service:
+        build: ./auth-service
+        container_name: auth-service
+        ports:
+            - '8082:8082'
+        depends_on:
+            - discovery-server
+        networks:
+            - stdiscm-network
+        environment:
+            - SPRING_PROFILES_ACTIVE=docker
+            - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
+            - SPRING_APPLICATION_NAME=auth-service
+
+    frontend-service:
+        build: ./frontend-service
+        container_name: frontend-service
+        ports:
+            - '8080:8080'
+        depends_on:
+            - discovery-server
+            - auth-service
+        networks:
+            - stdiscm-network
+        environment:
+            - SPRING_PROFILES_ACTIVE=docker
+            - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
+            - AUTH_SERVICE_URL=http://auth-service:8081
+            - SPRING_APPLICATION_NAME=frontend-service
+
+    course-service:
+        build: ./course-service
+        container_name: course-service
+        ports:
+            - '8083:8083'
+        depends_on:
+            - discovery-server
+        networks:
+            - stdiscm-network
+        environment:
+            - SPRING_PROFILES_ACTIVE=docker
+            - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
+            - SPRING_APPLICATION_NAME=course-service
+
+    enrollment-service:
+        build: ./enrollment-service
+        container_name: enrollment-service
+        ports:
+            - '8084:8084'
+        depends_on:
+            - discovery-server
+            - course-service
+        networks:
+            - stdiscm-network
+        environment:
+            - SPRING_PROFILES_ACTIVE=docker
+            - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
+            - SPRING_APPLICATION_NAME=enrollment-service
+
+    grade-service:
+        build: ./grade-service
+        container_name: grade-service
+        ports:
+            - '8085:8085'
+        depends_on:
+            - discovery-server
+            - enrollment-service
+        networks:
+            - stdiscm-network
+        environment:
+            - SPRING_PROFILES_ACTIVE=docker
+            - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
+            - SPRING_APPLICATION_NAME=grade-service
 
 volumes:
     db_data:
+        name: stdiscm_db_data
 
 networks:
-    app-network:
+    stdiscm-network:
+        driver: bridge

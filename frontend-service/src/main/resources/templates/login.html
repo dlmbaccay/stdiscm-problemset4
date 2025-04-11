@@ -1,164 +1,124 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Login</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-        .login-container {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 350px;
-            text-align: center;
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #555;
-            text-align: left;
-        }
-        input[type="text"],
-        input[type="password"] {
-            width: calc(100% - 16px);
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        button {
-            background-color: #007bff;
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .register-link {
-            margin-top: 20px;
-            color: #777;
-        }
-        .register-link a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        .register-link a:hover {
-            text-decoration: underline;
-        }
-        .error-message {
-            color: red;
-            margin-top: 10px;
-        }
-    </style>
-</head>
-<body>
-<div class="login-container">
-    <h1>Login</h1>
-    <form id="loginForm">
-        <label for="email">Email:</label>
-        <input type="text" id="email" name="email" required /><br><br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required /><br><br>
-        <button type="submit" onclick="submitLoginForm(event)">Login</button>
-    </form>
-    <p class="register-link">Don't have an account? <a href="/register">Register here</a></p>
-    <div id="error-container" class="error-message" style="display:none;"></div>
-</div>
-
-<script th:inline="javascript">
-    function submitLoginForm(event) {
-        event.preventDefault(); // Prevent the default form submission
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        const errorContainer = document.getElementById('error-container');
-        errorContainer.style.display = 'none'; // Hide previous errors
-
-        // Assuming you have a JavaScript function named 'makeHttpRequest' prepared
-        // that takes the method, URL, and data as arguments.
-        const loginUrl = 'http://localhost:8081/auth/login'; // Thymeleaf URL for the login endpoint
-
-        const requestData = {
-            email: email,
-            password: password
-        };
-
-
-        // Replace this with your actual JavaScript HTTP request logic
-        makeHttpRequest('POST', loginUrl, requestData)
-            .then(async response => {
-                // Handle successful login (e.g., redirect)
-                const data = await response.text()
-                console.log('Login successful:', data);
-
-                localStorage.setItem('authToken', data)
-                await fetch("http://localhost:8080/home", {
-                    method: 'GET'
-                })// Example redirect
-            })
-            .catch(error => {
-                // Handle login error (e.g., display error message)
-                console.error('Login failed:', error);
-                errorContainer.textContent = error.message || 'Invalid email or password.';
-                errorContainer.style.display = 'block';
-            });
-    }
-
-    // Example placeholder for your makeHttpRequest function
-    // You should replace this with your actual implementation
-    async function makeHttpRequest(method, url, data) {
-        const token = localStorage.getItem('authToken'); // Or sessionStorage, or read from cookie
-        console.log('Current Token: ', token)
-        const headers = {
-            'Content-Type': 'application/json',
-            // Add other default headers if needed
-        };
-
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-        }
-
-        try {
-            const response = await fetch(url, {
-                method: method,
-                headers: headers,
-                body: data ? JSON.stringify(data) : null,
-            });
-
-            if (!response.ok) {
-                // Handle error responses (e.g., token expired, unauthorized)
-                if (response.status === 401 || response.status === 403) {
-                    // Optionally clear the token and redirect to login
-                    localStorage.removeItem('authToken');
-                    window.location.href = '/login';
-                    throw new Error('Unauthorized');
-                }
-                const errorData = await response.json();
-                throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+    <head>
+        <title>Login</title>
+        <style>
+            body {
+                font-family: sans-serif;
+                background-color: #f4f4f4;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                margin: 0;
             }
+            .login-container {
+                background-color: #fff;
+                padding: 30px;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                width: 350px;
+                text-align: center;
+            }
+            h1 {
+                color: #333;
+                margin-bottom: 20px;
+            }
+            label {
+                display: block;
+                margin-bottom: 8px;
+                color: #555;
+                text-align: left;
+            }
+            input[type='text'],
+            input[type='password'] {
+                width: calc(100% - 16px);
+                padding: 10px;
+                margin-bottom: 20px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                box-sizing: border-box;
+            }
+            button {
+                background-color: #007bff;
+                color: white;
+                padding: 12px 20px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 16px;
+                transition: background-color 0.3s ease;
+            }
+            button:hover {
+                background-color: #0056b3;
+            }
+            .register-link {
+                margin-top: 20px;
+                color: #777;
+            }
+            .register-link a {
+                color: #007bff;
+                text-decoration: none;
+            }
+            .register-link a:hover {
+                text-decoration: underline;
+            }
+            .error-message {
+                color: red;
+                margin-top: 10px;
+            }
+        </style>
+        <script src="/js/auth.js"></script>
+    </head>
+    <body>
+        <div class="login-container">
+            <h1>Login</h1>
+            <form id="loginForm">
+                <label for="email">Email:</label>
+                <input type="text" id="email" name="email" required /><br /><br />
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required /><br /><br />
+                <button type="submit" onclick="submitLoginForm(event)">Login</button>
+            </form>
+            <p class="register-link">Don't have an account? <a href="/register">Register here</a></p>
+            <div id="error-container" class="error-message" style="display: none"></div>
+        </div>
 
-            return response;
-        } catch (error) {
-            throw error;
-        }
-    }
-</script>
-</body>
+        <script th:inline="javascript">
+            function submitLoginForm(event) {
+                event.preventDefault()
+                const email = document.getElementById('email').value
+                const password = document.getElementById('password').value
+                const errorContainer = document.getElementById('error-container')
+                errorContainer.style.display = 'none'
+
+                const loginUrl = 'http://localhost:8081/auth/login'
+                const requestData = {
+                    email: email,
+                    password: password,
+                }
+
+                fetch(loginUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData),
+                })
+                    .then(async (response) => {
+                        if (!response.ok) {
+                            throw new Error('Invalid email or password')
+                        }
+                        const data = await response.json()
+                        localStorage.setItem('authToken', data.token)
+                        window.location.href = '/home'
+                    })
+                    .catch((error) => {
+                        console.error('Login failed:', error)
+                        errorContainer.textContent = error.message || 'Invalid email or password.'
+                        errorContainer.style.display = 'block'
+                    })
+            }
+        </script>
+    </body>
 </html>

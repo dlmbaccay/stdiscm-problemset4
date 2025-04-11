@@ -1,30 +1,30 @@
 package com.garynation.frontend_service.controller;
 
-import java.util.HashMap;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.client.RestTemplate;
 
 @Controller
 public class AuthController {
 
     @GetMapping("/login")
-    public String loginPage() {
-        return "login";  // Return the login template
+    public String loginPage(Model model) {
+        return "login";
     }
 
     @GetMapping("/register")
     public String registerPage() {
-        return "register";  // Return the login template
+        return "register";
     }
 
     @GetMapping("/home")
     public String homePage() {
-        return "home";  // Render home page template
+        return "home";
+    }
+
+    @GetMapping("/courses")
+    public String coursesPage() {
+        return "courses";
     }
 
 //    @PostMapping("/auth/register")
