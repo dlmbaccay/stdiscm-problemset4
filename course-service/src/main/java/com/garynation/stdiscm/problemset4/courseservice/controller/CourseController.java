@@ -51,9 +51,16 @@ public class CourseController {
 
     @Operation(summary = "Get course by faculty id")
     @GetMapping("/faculty/{id}")
-    public ResponseEntity<CourseDto> getCourseByFacultyId(@PathVariable("id") UUID courseId) {
-        CourseDto course = courseService.getCourseById(courseId);
-        return new ResponseEntity<>(course, HttpStatus.OK);
+    public ResponseEntity<List<CourseDto>> getCourseByFacultyId(@PathVariable("id") UUID facultyId) {
+        List<CourseDto> courses = courseService.getAllCoursesByFacultyId(facultyId);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get course by student id")
+    @GetMapping("/student/{id}")
+    public ResponseEntity<List<CourseDto>> getCourseByStudentId(@PathVariable("id") UUID studentId) {
+        List<CourseDto> courses = courseService.getAllCoursesByStudentId(studentId);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 
     @Operation(summary = "Update course")

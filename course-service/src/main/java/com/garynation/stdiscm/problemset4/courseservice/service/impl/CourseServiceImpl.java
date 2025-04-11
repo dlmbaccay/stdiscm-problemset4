@@ -1,6 +1,7 @@
 package com.garynation.stdiscm.problemset4.courseservice.service.impl;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -8,9 +9,11 @@ import org.springframework.stereotype.Service;
 
 import com.garynation.stdiscm.problemset4.courseservice.dto.CourseDto;
 import com.garynation.stdiscm.problemset4.courseservice.entity.Course;
+import com.garynation.stdiscm.problemset4.courseservice.entity.Enrollment;
 import com.garynation.stdiscm.problemset4.courseservice.exception.ResourceNotFoundException;
 import com.garynation.stdiscm.problemset4.courseservice.mapper.CourseMapper;
 import com.garynation.stdiscm.problemset4.courseservice.repository.CourseRepository;
+import com.garynation.stdiscm.problemset4.courseservice.repository.EnrollmentRepository;
 import com.garynation.stdiscm.problemset4.courseservice.service.CourseService;
 
 import lombok.AllArgsConstructor;
@@ -20,7 +23,7 @@ import lombok.AllArgsConstructor;
 public class CourseServiceImpl implements CourseService {
 
     private CourseRepository courseRepository;
-
+    private EnrollmentRepository enrollmentRepository;
     @Override
     public CourseDto createCourse(CourseDto courseDto) {
         Course course = CourseMapper.mapToCourse(courseDto);
@@ -58,6 +61,16 @@ public class CourseServiceImpl implements CourseService {
     public List<CourseDto> getAllCoursesByFacultyId(UUID facultyId) {
         List<Course> courses = courseRepository.findByFacultyId(facultyId);
         return courses.stream().map(CourseMapper::mapToCourseDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CourseDto> getAllCoursesByStudentId(UUID studentId) {
+        List<Enrollment> enrollments = enrollmentRepository.findByUserId(studentId);
+        List<Course> enrolledCourses = enrollments.stream()
+                .map(enrollment -> courseRepository.findById(enrollment.getCourseId()).orElse(null))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        return enrolledCourses.stream().map(CourseMapper::mapToCourseDto).collect(Collectors.toList());
     }
 
     @Override

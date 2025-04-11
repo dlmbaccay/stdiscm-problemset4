@@ -1,4 +1,4 @@
-import { saveSession } from '../utils/session.js'
+import { saveSession, getSession } from '../utils/session.js'
 
 export async function login(requestData) {
     const loginUrl = 'http://localhost:8081/auth/login'
@@ -63,4 +63,25 @@ export async function getUserById(userId, token) {
 export async function logout() {
     localStorage.removeItem('user')
     window.location.href = '/public/login.html'
+}
+
+export async function refreshToken() {
+    const user = getSession()
+    const res = await fetch(`http://localhost:8081/auth/refresh`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${user.token}`,
+        },
+        body: JSON.stringify({ refreshToken: user.token }),
+    })
+
+    if (!res.ok) {
+        const msg = await res.text()
+        throw new Error(msg)
+    }
+
+    const data = await res.text()
+    const newUser = { ...user, token: data }
+    saveSession(newUser)
 }

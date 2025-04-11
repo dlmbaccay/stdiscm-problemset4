@@ -22,6 +22,17 @@ export async function getCoursesByFacultyId(facultyId, token) {
     return await res.json()
 }
 
+export async function getCoursesByStudentId(studentId, token) {
+    const res = await fetch(`${API_BASE}/courses/student/${studentId}`, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    })
+    if (!res.ok) throw new Error('Failed to fetch courses')
+    return await res.json()
+}
+
 export async function createCourse(course, token) {
     const res = await fetch(`${API_BASE}/courses/create`, {
         method: 'POST',

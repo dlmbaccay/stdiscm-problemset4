@@ -10,6 +10,7 @@ public interface CourseService {
     CourseDto updateCourse(UUID id, CourseDto courseDto);
     CourseDto getCourseById(UUID id);
     List<CourseDto> getAllCoursesByFacultyId(UUID facultyId);
+    List<CourseDto> getAllCoursesByStudentId(UUID studentId);
     List<CourseDto> getAllCourses();
     CourseDto deleteCourse(UUID id);
 }

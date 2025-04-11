@@ -2,6 +2,7 @@
 <html lang="en">
     <head>
         <title>My Courses</title>
+        <link rel="stylesheet" href="../src/assets/style.css" />
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -57,7 +58,7 @@
                 left: 0;
                 height: 100vh; /* Full viewport height */
                 box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-                z-index: 99; /* Below the header but above main content */
+                z-index: 1; /* Below the header but above main content */
             }
 
             .sidebar h2 {
@@ -65,6 +66,7 @@
                 color: #333;
                 text-align: center;
                 margin-bottom: 1rem;
+                margin-top: 2rem;
             }
 
             .user-info p {
@@ -92,6 +94,7 @@
                 flex-direction: row;
                 justify-content: center;
                 align-items: center;
+                gap: 1rem;
             }
 
             .refresh-btn {
@@ -146,18 +149,16 @@
 
             .add-course-section {
                 text-align: center;
-                margin-bottom: 1rem;
             }
 
             .add-course-btn {
                 background-color: #007bff;
                 color: white;
                 border: none;
-                padding: 0.75rem 1.5rem;
+                padding: 0.5rem 1rem;
                 border-radius: 4px;
                 cursor: pointer;
                 font-size: 1rem;
-                margin-bottom: 1rem;
             }
 
             .add-course-btn:hover {
@@ -167,7 +168,7 @@
             .modal {
                 display: none;
                 position: fixed;
-                z-index: 1;
+                z-index: 20;
                 left: 0;
                 top: 0;
                 width: 100%;
@@ -242,14 +243,13 @@
                 background-color: #117a8b;
             }
         </style>
-        <link rel="stylesheet" href="../src/assets/style.css" />
     </head>
     <body>
         <header>
             <nav>
                 <div><strong>Garynation Enrollment</strong></div>
                 <div class="nav-menu">
-                    <a href="/public/courses.html" id="nav-enroll">Enroll</a>
+                    <a href="/public/courses.html" id="nav-all-courses">All Courses</a>
                     <a href="/public/my-courses.html" id="nav-my-courses">My Courses</a>
                     <a href="/public/my-grades.html" id="nav-my-grades">My Grades</a>
                     <button class="logout-btn" onclick="logout()">Logout</button>

@@ -1,15 +1,26 @@
 package com.garynation.stdiscm.problemset4.gradeservice.controller;
 
-import com.garynation.stdiscm.problemset4.gradeservice.dto.GradeDto;
-import com.garynation.stdiscm.problemset4.gradeservice.service.GradeService;
-import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import java.util.UUID;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.garynation.stdiscm.problemset4.gradeservice.dto.CourseGradeDto;
+import com.garynation.stdiscm.problemset4.gradeservice.dto.GradeDto;
+import com.garynation.stdiscm.problemset4.gradeservice.dto.UserGradeDto;
+import com.garynation.stdiscm.problemset4.gradeservice.service.GradeService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @RestController
@@ -60,16 +71,16 @@ public class GradeController {
 
     @Operation(summary = "Get all grades by course id")
     @GetMapping("/all/course/{courseId}")
-    public ResponseEntity<List<GradeDto>> getAllGradesByCourseId(@PathVariable("courseId") UUID courseId) {
-        List<GradeDto> grades = gradeService.getAllGradeByCourseId(courseId);
+    public ResponseEntity<List<UserGradeDto>> getAllGradesByCourseId(@PathVariable("courseId") UUID courseId) {
+        List<UserGradeDto> grades = gradeService.getAllGradeByCourseId(courseId);
         return new ResponseEntity<>(grades, HttpStatus.OK);
 
     }
 
     @Operation(summary = "Get all grades by student id")
     @GetMapping("/all/student/{studentId}")
-    public ResponseEntity<List<GradeDto>> getAllGradesByStudentId(@PathVariable("studentId") UUID studentId) {
-        List<GradeDto> grades = gradeService.getAllGradeByStudentId(studentId);
+    public ResponseEntity<List<CourseGradeDto>> getAllGradesByStudentId(@PathVariable("studentId") UUID studentId) {
+        List<CourseGradeDto> grades = gradeService.getAllGradeByStudentId(studentId);
         return new ResponseEntity<>(grades, HttpStatus.OK);
     }
 

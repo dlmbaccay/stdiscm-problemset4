@@ -2,6 +2,7 @@
 <html lang="en">
     <head>
         <title>My Grades</title>
+        <link rel="stylesheet" href="../src/assets/style.css" />
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -61,7 +62,7 @@
             }
 
             .sidebar h2 {
-                margin-top: 0;
+                margin-top: 2rem;
                 color: #333;
                 text-align: center;
                 margin-bottom: 1rem;
@@ -222,10 +223,6 @@
                 background-color: #c82333;
             }
 
-            .enroll-button-container {
-                /* Container to manage visibility */
-            }
-
             .enroll-btn + .enroll-btn {
                 background-color: #17a2b8;
             }
@@ -268,14 +265,13 @@
                 color: #000;
             }
         </style>
-        <link rel="stylesheet" href="../src/assets/style.css" />
     </head>
     <body>
         <header>
             <nav>
                 <div><strong>Garynation Enrollment</strong></div>
                 <div class="nav-menu">
-                    <a href="/public/courses.html" id="nav-enroll">Enroll</a>
+                    <a href="/public/courses.html" id="nav-all-courses">All Courses</a>
                     <a href="/public/my-courses.html" id="nav-my-courses">My Courses</a>
                     <a href="/public/my-grades.html" id="nav-my-grades">My Grades</a>
                     <button class="logout-btn" onclick="logout()">Logout</button>

@@ -16,8 +16,7 @@ public class JwtUtil {
     @Value("${jwt.expiration}")
     private int jwtExpirationMs;
     private SecretKey key;
-    // Initializes the key after the class is instantiated and the jwtSecret is injected,
-    // preventing the repeated creation of the key and enhancing performance
+    
     @PostConstruct
     public void init() {
         this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));

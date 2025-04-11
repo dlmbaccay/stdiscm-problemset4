@@ -1,7 +1,13 @@
 import { getCourseById } from '../models/courseModel.js'
-import { getEnrollmentsByStudentId, enrollInCourse, dropCourse } from '../models/enrollModel.js'
+import {
+    getEnrollmentsByStudentId,
+    enrollInCourse,
+    dropCourse,
+    getEnrollmentsByCourseId,
+} from '../models/enrollModel.js'
 import { getUserById } from '../models/authModel.js'
-import { logout } from '../models/authModel.js'
+import { createGrade, updateGrade, getGradesByCourseIdAndStudentId, getGradesByCourseId } from '../models/gradeModel.js'
+import { logout, refreshToken } from '../models/authModel.js'
 
 const courseId = new URLSearchParams(window.location.search).get('id')
 const user = JSON.parse(localStorage.getItem('user'))
@@ -29,12 +35,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Show enroll/drop button if student
         if (user.role === 'student') {
-            await renderEnrollmentButton()
+            await renderEnrollmentButton(course.id)
+        }
+        if (user.role === 'faculty' && course.facultyId === user.id) {
+            await renderFacultyGradePanel(course.id)
         }
     } catch (err) {
         alert('Failed to load course: ' + err.message)
         window.location.href = '/public/courses.html'
     }
+
+    refreshToken()
 })
 
 function controlNavVisibility() {
@@ -42,7 +53,6 @@ function controlNavVisibility() {
     if (!user) return
 
     if (user.role === 'faculty') {
-        document.getElementById('nav-enroll')?.remove()
         document.getElementById('nav-my-grades')?.remove()
     }
 }
@@ -59,9 +69,70 @@ function displayUserInfo() {
     }
 }
 
-async function renderEnrollmentButton() {
+async function renderFacultyGradePanel(courseId) {
+    const gradesSection = document.getElementById('grades-section')
+    gradesSection.innerHTML = '<h2>Manage Student Grades</h2>'
+
     try {
-        const enrollments = await getEnrollmentsByStudentId(user.token, user.id)
+        const grades = await getGradesByCourseId(courseId, user.token)
+        if (!grades.length) {
+            gradesSection.innerHTML += '<p>No students enrolled.</p>'
+            return
+        }
+
+        const table = document.createElement('table')
+        table.style.width = '100%'
+        table.style.borderCollapse = 'collapse'
+        table.innerHTML = `
+            <thead>
+                <tr>
+                    <th style="text-align:left; padding: 8px; border-bottom: 1px solid #ccc;">Student</th>
+                    <th style="text-align:left; padding: 8px; border-bottom: 1px solid #ccc;">Grade</th>
+                    <th style="padding: 8px; border-bottom: 1px solid #ccc;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                ${grades
+                    .map(
+                        (e) => `
+                    <tr data-enrollment-id="${e.id}">
+                        <td style="padding: 8px;">${e.firstName} ${e.lastName}</td>
+                        <td style="padding: 8px;">
+                            <input type="text" value="${e.grade ?? ''}" style="width: 100px;" />
+                        </td>
+                        <td style="padding: 8px;">
+                            <button class="enroll-btn" data-grade-id="${e.id}">Save</button>
+                        </td>
+                    </tr>
+                `,
+                    )
+                    .join('')}
+            </tbody>
+        `
+
+        gradesSection.appendChild(table)
+
+        // Add event listeners to buttons
+        const buttons = gradesSection.querySelectorAll('.enroll-btn')
+        buttons.forEach((button) => {
+            button.addEventListener('click', (event) => {
+                const row = event.target.closest('tr')
+                const gradeId = row.getAttribute('data-enrollment-id')
+                const gradeInput = row.querySelector('input').value
+                const gradeData = {
+                    grade: gradeInput.trim(),
+                }
+                saveGrade(gradeId, gradeData, user.token)
+            })
+        })
+    } catch (err) {
+        gradesSection.innerHTML += `<p>Error loading students: ${err.message}</p>`
+    }
+}
+
+async function renderEnrollmentButton(courseId) {
+    try {
+        const enrollments = await getEnrollmentsByStudentId(user.id, user.token)
 
         const enrollment = enrollments.find((e) => e.courseId === courseId)
         const container = document.getElementById('action-button-container')
@@ -98,6 +169,19 @@ async function enroll(courseId) {
         window.location.reload()
     } catch (err) {
         alert('Enroll failed: ' + err.message)
+    }
+}
+
+async function saveGrade(gradeId, gradeData, token) {
+    try {
+        if (gradeData.grade < 0 || gradeData.grade > 4) {
+            throw new Error('Grade must be between 0 and 4')
+        }
+        const res = await updateGrade(gradeId, gradeData, token)
+        if (!res) throw new Error('Failed to update grade')
+        alert('Grade updated successfully!')
+    } catch (err) {
+        alert('Failed to update grade: ' + err.message)
     }
 }
 

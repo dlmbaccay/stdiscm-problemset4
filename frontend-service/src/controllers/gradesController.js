@@ -1,12 +1,13 @@
 import { getAllCourses, createCourse } from '../models/courseModel.js'
 import { getEnrollmentsByStudentId, enrollInCourse, dropCourse } from '../models/enrollModel.js'
 import { getGradesByStudentId } from '../models/gradeModel.js'
-import { logout } from '../models/authModel.js'
+import { logout, refreshToken } from '../models/authModel.js'
 
 document.addEventListener('DOMContentLoaded', () => {
     displayUserInfo()
     controlNavVisibility()
     fetchAndDisplayCoursesWithGrades()
+    refreshToken()
 })
 
 function displayUserInfo() {
@@ -26,7 +27,6 @@ function controlNavVisibility() {
     if (!user) return
 
     if (user.role === 'faculty') {
-        document.getElementById('nav-enroll')?.remove()
         document.getElementById('nav-my-grades')?.remove()
     }
 }
@@ -36,26 +36,21 @@ async function fetchAndDisplayCoursesWithGrades() {
     if (!user) return (window.location.href = '/public/login.html')
 
     try {
-        const courses = await getAllCourses(user.token)
-        const enrollments = user.role === 'student' ? await getEnrollmentsByStudentId(user.token, user.id) : []
-        const grades = await getGradesByStudentId(user.id, user.token)
+        // const courses = await getAllCourses(user.token)
+        const courseGrades = await getGradesByStudentId(user.id, user.token)
         const list = document.getElementById('grades-list')
         list.innerHTML = ''
 
-        let enrolledCourses = []
-        enrollments.forEach(async (enrollment) => {
-            const course = courses.find((c) => c.id === enrollment.courseId)
-            enrolledCourses.push(course)
-        })
-
         const summary = document.getElementById('summary')
         summary.innerHTML = `
-            <p><strong>GPA:</strong> ${grades.reduce((sum, grade) => sum + grade.grade, 0) / grades.length || 'N/A'}</p>
-            <p><strong>Courses Enrolled:</strong> ${enrolledCourses.length}</p>
+            <p><strong>GPA:</strong> ${
+                courseGrades.reduce((sum, grade) => sum + grade.grade, 0) / courseGrades.length || 'N/A'
+            }</p>
+            <p><strong>Courses Enrolled:</strong> ${courseGrades.length}</p>
         `
 
-        enrolledCourses.forEach((course) => {
-            const grade = grades.find((g) => g.courseId === course.id)
+        courseGrades.forEach((courseGrade) => {
+            // const grade = grades.find((g) => g.courseId === course.id)
             const div = document.createElement('div')
             div.className = 'course'
 
@@ -66,17 +61,16 @@ async function fetchAndDisplayCoursesWithGrades() {
             const courseInfo = document.createElement('div')
             courseInfo.className = 'course-info'
 
-            if (grade) {
+            if (courseGrade) {
                 courseInfo.innerHTML = `
-                <strong>${course.courseCode}: ${course.courseName}</strong><br>
-                Enrolled: ${course.currentEnrollees}/${course.maxEnrollees}<br>
-                Grade: ${grade?.grade ? grade.grade : 'N/A'}
-                Updated: ${grade?.updatedAt ? grade.updatedAt.toLocaleDateString() : 'N/A'}
+                <strong>${courseGrade.courseCode}: ${courseGrade.courseName}</strong><br>
+                Enrolled: ${courseGrade.currentEnrollees}/${courseGrade.maxEnrollees}<br>
+                Grade: ${courseGrade?.grade ? courseGrade.grade : 'N/A'}
             `
             } else {
                 courseInfo.innerHTML = `
-                <strong>${course.courseCode}: ${course.courseName}</strong><br>
-                Enrolled: ${course.currentEnrollees}/${course.maxEnrollees}<br>
+                <strong>${courseGrade.courseCode}: ${courseGrade.courseName}</strong><br>
+                Enrolled: ${courseGrade.currentEnrollees}/${courseGrade.maxEnrollees}<br>
                 Grade: N/A
             `
             }
@@ -85,7 +79,7 @@ async function fetchAndDisplayCoursesWithGrades() {
             const viewBtn = document.createElement('button')
             viewBtn.className = 'enroll-btn'
             viewBtn.textContent = 'View Course'
-            viewBtn.onclick = () => viewCourse(course.id)
+            viewBtn.onclick = () => viewCourse(courseGrade.courseId)
             actionContainer.appendChild(viewBtn)
 
             // Append info + action to course div

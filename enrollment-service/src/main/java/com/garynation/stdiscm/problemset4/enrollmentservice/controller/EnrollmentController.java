@@ -35,7 +35,7 @@ public class EnrollmentController {
     @Operation(summary = "Delete enrollment")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteEnrollment(@PathVariable("id") UUID enrollmentId) {
-        EnrollmentDto enrollment = enrollmentService.deleteEnrollment(enrollmentId);
+        enrollmentService.deleteEnrollment(enrollmentId);
         return ResponseEntity.ok("Enrollment deleted succesfully.");
     }
 

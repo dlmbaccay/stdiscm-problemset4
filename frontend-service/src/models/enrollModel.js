@@ -32,7 +32,7 @@ export async function dropCourse(enrollmentId, token) {
     return true
 }
 
-export async function getEnrollmentsByStudentId(token, studentId) {
+export async function getEnrollmentsByStudentId(studentId, token) {
     const res = await fetch(`${API_BASE}/enrollment/user/${studentId}`, {
         method: 'GET',
         headers: {
@@ -46,7 +46,7 @@ export async function getEnrollmentsByStudentId(token, studentId) {
     return enrollments
 }
 
-export async function getEnrollmentsByCourseId(token, courseId) {
+export async function getEnrollmentsByCourseId(courseId, token) {
     const res = await fetch(`${API_BASE}/enrollment/course/${courseId}`, {
         method: 'GET',
         headers: {

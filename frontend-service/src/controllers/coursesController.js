@@ -1,12 +1,13 @@
-import { getAllCourses, createCourse } from '../models/courseModel.js'
+import { getAllCourses, createCourse, deleteCourse } from '../models/courseModel.js'
 import { getEnrollmentsByStudentId, enrollInCourse, dropCourse } from '../models/enrollModel.js'
-import { logout } from '../models/authModel.js'
+import { logout, refreshToken } from '../models/authModel.js'
 
 document.addEventListener('DOMContentLoaded', () => {
     displayUserInfo()
     controlNavVisibility()
     checkUserRoleAndAddButton()
     fetchAndDisplayCourses()
+    refreshToken()
 })
 
 function controlNavVisibility() {
@@ -14,7 +15,6 @@ function controlNavVisibility() {
     if (!user) return
 
     if (user.role === 'faculty') {
-        document.getElementById('nav-enroll')?.remove()
         document.getElementById('nav-my-grades')?.remove()
     }
 }
@@ -54,7 +54,7 @@ async function fetchAndDisplayCourses() {
 
     try {
         const courses = await getAllCourses(user.token)
-        const enrollments = user.role === 'student' ? await getEnrollmentsByStudentId(user.token, user.id) : []
+        const enrollments = user.role === 'student' ? await getEnrollmentsByStudentId(user.id, user.token) : []
 
         const list = document.getElementById('courses-list')
         list.innerHTML = ''
@@ -106,6 +106,28 @@ async function fetchAndDisplayCourses() {
                 }
 
                 actionContainer.appendChild(actionBtn)
+            } else {
+                const isFaculty = course.facultyId === user.id
+                let actionBtn
+
+                if (isFaculty) {
+                    actionBtn = document.createElement('button')
+                    actionBtn.className = 'enroll-btn'
+                    actionBtn.textContent = 'Delete Course'
+                    actionBtn.onclick = async () => {
+                        try {
+                            await deleteCourse(course.id, user.token)
+                            alert('Course deleted!')
+                            fetchAndDisplayCourses()
+                        } catch (err) {
+                            alert(`Failed to delete course: ${err.message}`)
+                        }
+                    }
+                }
+
+                if (actionBtn) {
+                    actionContainer.appendChild(actionBtn)
+                }
             }
 
             // Always show the View button

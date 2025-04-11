@@ -1,12 +1,13 @@
-import { getAllCourses, createCourse } from '../models/courseModel.js'
+import { getAllCourses, createCourse, getCoursesByFacultyId, getCoursesByStudentId } from '../models/courseModel.js'
 import { getEnrollmentsByStudentId, enrollInCourse, dropCourse } from '../models/enrollModel.js'
-import { logout } from '../models/authModel.js'
+import { logout, refreshToken } from '../models/authModel.js'
 
 document.addEventListener('DOMContentLoaded', () => {
     displayUserInfo()
     controlNavVisibility()
     checkUserRoleAndAddButton()
     fetchAndDisplayCourses()
+    refreshToken()
 })
 
 function displayUserInfo() {
@@ -26,7 +27,6 @@ function controlNavVisibility() {
     if (!user) return
 
     if (user.role === 'faculty') {
-        document.getElementById('nav-enroll')?.remove()
         document.getElementById('nav-my-grades')?.remove()
     }
 }
@@ -53,19 +53,17 @@ async function fetchAndDisplayCourses() {
     if (!user) return (window.location.href = '/public/login.html')
 
     try {
-        const courses = await getAllCourses(user.token)
-        const enrollments = user.role === 'student' ? await getEnrollmentsByStudentId(user.token, user.id) : []
+        const courses =
+            user.role === 'faculty'
+                ? await getCoursesByFacultyId(user.id, user.token)
+                : await getCoursesByStudentId(user.id, user.token)
+
+        const enrollments = user.role === 'student' ? await getEnrollmentsByStudentId(user.id, user.token) : []
 
         const list = document.getElementById('courses-list')
         list.innerHTML = ''
 
-        let enrolledCourses = []
-        enrollments.forEach((enrollment) => {
-            const course = courses.find((c) => c.id === enrollment.courseId)
-            enrolledCourses.push(course)
-        })
-
-        enrolledCourses.forEach((course) => {
+        courses.forEach((course) => {
             const div = document.createElement('div')
             div.className = 'course'
 
@@ -107,6 +105,25 @@ async function fetchAndDisplayCourses() {
                             fetchAndDisplayCourses()
                         } catch (err) {
                             alert(`Failed to enroll: ${err.message}`)
+                        }
+                    }
+                }
+
+                actionContainer.appendChild(actionBtn)
+            } else {
+                const isFaculty = course.facultyId === user.id
+                const actionBtn = document.createElement('button')
+                actionBtn.className = 'enroll-btn'
+
+                if (isFaculty) {
+                    actionBtn.textContent = 'Delete Course'
+                    actionBtn.onclick = async () => {
+                        try {
+                            await deleteCourse(course.id, user.token)
+                            alert('Course deleted!')
+                            fetchAndDisplayCourses()
+                        } catch (err) {
+                            alert(`Failed to delete course: ${err.message}`)
                         }
                     }
                 }

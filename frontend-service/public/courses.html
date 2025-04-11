@@ -58,14 +58,14 @@
                 left: 0;
                 height: 100vh; /* Full viewport height */
                 box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-                z-index: 99; /* Below the header but above main content */
+                z-index: 2; /* Below the header but above main content */
             }
 
             .sidebar h2 {
-                margin-top: 0;
                 color: #333;
                 text-align: center;
                 margin-bottom: 1rem;
+                margin-top: 2rem;
             }
 
             .user-info p {
@@ -89,6 +89,11 @@
             .controls-container {
                 text-align: center;
                 margin-bottom: 1rem;
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+                gap: 1rem;
             }
 
             .refresh-btn {
@@ -99,7 +104,6 @@
                 border-radius: 4px;
                 cursor: pointer;
                 font-size: 1rem;
-                margin-bottom: 1rem;
             }
 
             .refresh-btn:hover {
@@ -144,18 +148,16 @@
 
             .add-course-section {
                 text-align: center;
-                margin-bottom: 1rem;
             }
 
             .add-course-btn {
                 background-color: #007bff;
                 color: white;
                 border: none;
-                padding: 0.75rem 1.5rem;
+                padding: 0.5rem 1rem;
                 border-radius: 4px;
                 cursor: pointer;
                 font-size: 1rem;
-                margin-bottom: 1rem;
             }
 
             .add-course-btn:hover {
@@ -165,7 +167,7 @@
             .modal {
                 display: none;
                 position: fixed;
-                z-index: 1;
+                z-index: 5;
                 left: 0;
                 top: 0;
                 width: 100%;
@@ -246,7 +248,7 @@
             <nav>
                 <div><strong>Garynation Enrollment</strong></div>
                 <div class="nav-menu">
-                    <a href="/public/courses.html" id="nav-enroll">Enroll</a>
+                    <a href="/public/courses.html" id="nav-all-courses">All Courses</a>
                     <a href="/public/my-courses.html" id="nav-my-courses">My Courses</a>
                     <a href="/public/my-grades.html" id="nav-my-grades">My Grades</a>
                     <button class="logout-btn" onclick="logout()">Logout</button>
@@ -268,9 +270,8 @@
 
             <div class="controls-container">
                 <button class="refresh-btn" onclick="fetchCourses()">Refresh Courses</button>
+                <div class="add-course-section" id="add-course-section"></div>
             </div>
-
-            <div class="add-course-section" id="add-course-section"></div>
 
             <div class="courses-container" id="courses-list"></div>
 
