@@ -1,7 +1,9 @@
+header('Content-Type: text/javascript')
 // Function to add auth headers to all fetch requests
 const originalFetch = window.fetch
 window.fetch = async function (url, options = {}) {
-    const token = localStorage.getItem('authToken')
+    const user = localStorage.getItem('user')
+    const token = JSON.parse(user).token
 
     if (token) {
         options.headers = {

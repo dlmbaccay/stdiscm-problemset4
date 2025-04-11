@@ -84,7 +84,6 @@ public class UserController {
         );
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String token = jwtUtils.generateToken(userDetails.getUsername());
-        System.out.println(userDetails);
         UserDto user = userService.getUserByEmail(userDetails.getUsername());
         UserWithTokenDto userWithTokenDto = new UserWithTokenDto(
             user.getId(),
@@ -92,18 +91,26 @@ public class UserController {
             user.getLastName(),
             user.getEmail(),
             user.getRole(),
-            token,
-            userDetails
+            token
         );
     
         return new ResponseEntity<>(userWithTokenDto, HttpStatus.OK);
     }
     @Operation(summary = "Create user, omit id")
     @PostMapping("/register")
-    public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
+    public ResponseEntity<UserWithTokenDto> createUser(@RequestBody UserDto userDto) {
         userDto.setPassword(encoder.encode(userDto.getPassword()));
         UserDto user = userService.createUser(userDto);
-        return new ResponseEntity<>(user, HttpStatus.CREATED);
+        String token = jwtUtils.generateToken(user.getEmail());
+        UserWithTokenDto userWithTokenDto = new UserWithTokenDto(
+            user.getId(),
+            user.getFirstName(),
+            user.getLastName(),
+            user.getEmail(),
+            user.getRole(),
+            token
+        );
+        return new ResponseEntity<>(userWithTokenDto, HttpStatus.CREATED);
     }
 
     @Operation(summary = "Refresh token")

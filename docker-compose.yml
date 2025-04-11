@@ -67,21 +67,21 @@ services:
             - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
             - SPRING_APPLICATION_NAME=auth-service
 
-    frontend-service:
-        build: ./frontend-service
-        container_name: frontend-service
-        ports:
-            - '8080:8080'
-        depends_on:
-            - discovery-server
-            - auth-service
-        networks:
-            - stdiscm-network
-        environment:
-            - SPRING_PROFILES_ACTIVE=docker
-            - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
-            - AUTH_SERVICE_URL=http://auth-service:8081
-            - SPRING_APPLICATION_NAME=frontend-service
+    # frontend-service:
+    #     build: ./frontend-service
+    #     container_name: frontend-service
+    #     ports:
+    #         - '8080:8080'
+    #     depends_on:
+    #         - discovery-server
+    #         - auth-service
+    #     networks:
+    #         - stdiscm-network
+    #     environment:
+    #         - SPRING_PROFILES_ACTIVE=docker
+    #         - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
+    #         - AUTH_SERVICE_URL=http://auth-service:8081
+    #         - SPRING_APPLICATION_NAME=frontend-service
 
     course-service:
         build: ./course-service

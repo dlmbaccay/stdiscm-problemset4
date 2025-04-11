@@ -27,6 +27,8 @@ public class AuthController {
         return "courses";
     }
 
+    
+
 //    @PostMapping("/auth/register")
 //    public String register(@RequestParam String username, @RequestParam String password, Model model) {
 //        // For now, just a simple check

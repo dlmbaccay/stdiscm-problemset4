@@ -2,20 +2,222 @@
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
         <title>Register</title>
+        <style>
+            body {
+                font-family: sans-serif;
+                background-color: #f4f4f4;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                margin: 0;
+            }
+
+            .register-container {
+                background-color: #fff;
+                padding: 30px;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                width: 400px;
+            }
+
+            h1 {
+                text-align: center;
+                color: #333;
+                margin-bottom: 20px;
+            }
+
+            label {
+                display: block;
+                color: #555;
+                font-weight: bold;
+            }
+
+            input[type='text'],
+            input[type='email'],
+            input[type='password'] {
+                width: calc(100% - 16px);
+                padding: 10px;
+                margin-bottom: 15px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                box-sizing: border-box;
+                font-size: 16px;
+            }
+
+            .role-group {
+                margin-bottom: 15px;
+                color: #555;
+                font-weight: bold;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+            }
+
+            .role-option {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                margin-right: 20px;
+            }
+
+            button {
+                background-color: #5cb85c; /* Green button */
+                color: white;
+                padding: 12px 20px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 16px;
+                width: 100%;
+                transition: background-color 0.3s ease;
+            }
+
+            button:hover {
+                background-color: #4cae4c;
+            }
+
+            p {
+                text-align: center;
+                margin-top: 20px;
+                color: #777;
+            }
+
+            a {
+                color: #337ab7;
+                text-decoration: none;
+            }
+
+            a:hover {
+                text-decoration: underline;
+            }
+
+            .error-message {
+                color: red;
+                margin-top: 10px;
+                text-align: center;
+            }
+        </style>
+        <script src="../static/js/auth.js"></script>
     </head>
     <body>
-        <h1>Register</h1>
-        <form action="/auth/register" method="post">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required /><br /><br />
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required /><br /><br />
-            <label for="confirmPassword">Confirm Password:</label>
-            <input type="password" id="confirmPassword" name="confirmPassword" required /><br /><br />
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required /><br /><br />
-            <button type="submit">Register</button>
-        </form>
-        <p>Already have an account? <a href="/login">Login here</a></p>
+        <div class="register-container">
+            <h1>Register</h1>
+            <form id="registrationForm">
+                <label for="firstName">First Name:</label>
+                <input type="text" id="firstName" name="firstName" required /><br />
+
+                <label for="lastName">Last Name:</label>
+                <input type="text" id="lastName" name="lastName" required /><br />
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required /><br />
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required /><br />
+
+                <label for="confirmPassword">Confirm Password:</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required /><br />
+
+                <div class="role-group">
+                    <label>Role:</label><br />
+                    <div class="role-option">
+                        <input type="radio" id="student" name="role" value="student" required />
+                        <label for="student">Student</label>
+                    </div>
+                    <div class="role-option">
+                        <input type="radio" id="faculty" name="role" value="faculty" required />
+                        <label for="faculty">Faculty</label>
+                    </div>
+                </div>
+
+                <button type="button" onclick="registerUser()">Register</button>
+            </form>
+            <p>Already have an account? <a href="/login">Login here</a></p>
+            <div id="errorMessage" class="error-message" style="display: none"></div>
+        </div>
+
+        <script>
+            function registerUser() {
+                const form = document.getElementById('registrationForm')
+                const firstName = form.firstName.value
+                const lastName = form.lastName.value
+                const email = form.email.value
+                const password = form.password.value
+                const confirmPassword = form.confirmPassword.value
+                const role = document.querySelector('input[name="role"]:checked')?.value
+                const errorMessageDiv = document.getElementById('errorMessage')
+                errorMessageDiv.style.display = 'none' // Hide previous error messages
+
+                if (!firstName || !lastName || !email || !password || !confirmPassword || !role) {
+                    errorMessageDiv.textContent = 'Please fill in all fields.'
+                    errorMessageDiv.style.display = 'block'
+                    return
+                }
+
+                if (password !== confirmPassword) {
+                    errorMessageDiv.textContent = 'Passwords do not match.'
+                    errorMessageDiv.style.display = 'block'
+                    return
+                }
+
+                // Basic email validation (you might want more robust validation)
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+                if (!emailRegex.test(email)) {
+                    errorMessageDiv.textContent = 'Please enter a valid email address.'
+                    errorMessageDiv.style.display = 'block'
+                    return
+                }
+
+                // You would typically send this data to your server-side endpoint
+                const registrationData = {
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    password: password,
+                    role: role,
+                }
+
+                // Example of how you might send data using fetch API
+                fetch('http://localhost:8081/auth/register', {
+                    // Replace with your actual API endpoint
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(registrationData),
+                })
+                    .then(async (response) => {
+                        if (response.ok) {
+                            // Registration successful, redirect or show success message
+                            const data = await response.json()
+                            localStorage.setItem('user', JSON.stringify(data))
+                            window.location.href = '/home' // Redirect to a success page
+                            // Or:
+                            // errorMessageDiv.textContent = 'Registration successful!';
+                            // errorMessageDiv.style.color = 'green';
+                            // errorMessageDiv.style.display = 'block';
+                        } else {
+                            // Registration failed, display error message from the server
+                            return response.json()
+                        }
+                    })
+                    .then((data) => {
+                        if (data && data.message) {
+                            errorMessageDiv.textContent = data.message
+                            errorMessageDiv.style.display = 'block'
+                        } else {
+                            errorMessageDiv.textContent = 'Registration failed. Please try again.'
+                            errorMessageDiv.style.display = 'block'
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error during registration:', error)
+                        errorMessageDiv.textContent = 'An unexpected error occurred. Please try again later.'
+                        errorMessageDiv.style.display = 'block'
+                    })
+            }
+        </script>
     </body>
 </html>

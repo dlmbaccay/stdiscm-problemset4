@@ -9,31 +9,106 @@
                 background: #f8f9fa;
                 margin: 0;
                 padding: 0;
+                display: flex; /* Enable flex layout for sidebar */
+                width: 100%;
             }
 
             header {
                 background-color: #343a40;
                 color: #fff;
-                padding: 1rem 2rem;
+                padding-top: 1rem;
+                padding-bottom: 1rem;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
+                position: fixed; /* Fixed header */
+                top: 0;
+                left: 0;
+                width: 100%;
+                z-index: 100;
+            }
+
+            nav {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                gap: 1rem;
+                padding-left: 2rem;
+                padding-right: 2rem;
             }
 
             nav a {
-                margin-left: 1rem;
                 color: #fff;
                 text-decoration: none;
             }
 
+            nav a:hover {
+                color: #f0f0f0;
+                text-decoration: underline;
+            }
+
+            .sidebar {
+                background-color: #f0f0f0;
+                padding: 1rem;
+                width: 200px; /* Adjust width as needed */
+                position: fixed; /* Fixed sidebar */
+                top: 56px; /* Adjust top to be below the header */
+                left: 0;
+                height: 100vh; /* Full viewport height */
+                box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+                z-index: 99; /* Below the header but above main content */
+            }
+
+            .sidebar h2 {
+                margin-top: 0;
+                color: #333;
+                text-align: center;
+                margin-bottom: 1rem;
+            }
+
+            .user-info p {
+                margin-bottom: 0.5rem;
+                color: #555;
+            }
+
+            .content {
+                flex-grow: 1; /* Allow content to take remaining width */
+                padding: 2rem;
+                margin-left: 220px; /* Adjust margin to accommodate sidebar width */
+                margin-top: 76px; /* Adjust top margin to be below header and some extra space */
+            }
+
             h1 {
                 text-align: center;
-                margin-top: 2rem;
+                margin-top: 0;
+                margin-bottom: 1rem;
+            }
+
+            .controls-container {
+                text-align: center;
+                margin-bottom: 1rem;
+            }
+
+            .refresh-btn {
+                background-color: #007bff;
+                color: white;
+                border: none;
+                padding: 0.5rem 1rem;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .refresh-btn:hover {
+                background-color: #0056b3;
             }
 
             .courses-container {
                 max-width: 1000px;
-                margin: 2rem auto;
+                margin: 0 auto;
                 padding: 1rem;
                 background: #ffffff;
                 border-radius: 8px;
@@ -66,62 +141,248 @@
             .enroll-btn:hover {
                 background-color: #218838;
             }
+
+            .add-course-section {
+                text-align: center;
+                margin-bottom: 1rem;
+            }
+
+            .add-course-btn {
+                background-color: #007bff;
+                color: white;
+                border: none;
+                padding: 0.75rem 1.5rem;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .add-course-btn:hover {
+                background-color: #0056b3;
+            }
+
+            .modal {
+                display: none;
+                position: fixed;
+                z-index: 1;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                overflow: auto;
+                background-color: rgba(0, 0, 0, 0.4);
+            }
+
+            .modal-content {
+                background-color: #fefefe;
+                margin: 15% auto;
+                padding: 20px;
+                border: 1px solid #888;
+                width: 80%;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+            }
+
+            .modal-content label {
+                display: block;
+                margin-bottom: 0.5rem;
+                font-weight: bold;
+            }
+
+            .modal-content input[type='text'],
+            .modal-content input[type='number'] {
+                width: calc(100% - 12px);
+                padding: 8px;
+                margin-bottom: 1rem;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                box-sizing: border-box;
+            }
+
+            .modal-content button {
+                background-color: #007bff;
+                color: white;
+                border: none;
+                padding: 0.75rem 1.5rem;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 1rem;
+                margin-right: 0.5rem;
+            }
+
+            .modal-content button:hover {
+                background-color: #0056b3;
+            }
+
+            .modal-content .close-btn {
+                background-color: #dc3545;
+            }
+
+            .modal-content .close-btn:hover {
+                background-color: #c82333;
+            }
+
+            .enroll-button-container {
+                /* Container to manage visibility */
+            }
         </style>
-        <script src="/frontend-service/src/main/resources/static/js/auth.js"></script>
     </head>
     <body>
         <header>
-            <div><strong>Courses Page</strong></div>
             <nav>
-                <a href="/enroll">Enroll</a>
-                <a href="/my-courses">My Courses</a>
-                <a href="/my-grades">My Grades</a>
-                <a href="/logout">Logout</a>
+                <div><strong>Courses Page</strong></div>
+                <div style="display: flex; gap: 2rem">
+                    <a href="/enroll">Enroll</a>
+                    <a href="/my-courses">My Courses</a>
+                    <a href="/my-grades">My Grades</a>
+                    <a href="/logout">Logout</a>
+                </div>
             </nav>
         </header>
 
-        <h1>Available Courses</h1>
+        <div class="sidebar" id="user-sidebar">
+            <h2>User Info</h2>
+            <div class="user-info">
+                <p><strong>Name:</strong> <span id="user-name"></span></p>
+                <p><strong>Role:</strong> <span id="user-role"></span></p>
+                <p><strong>Email:</strong> <span id="user-email"></span></p>
+            </div>
+        </div>
 
-        <div class="courses-container" id="courses-list">
-            <!-- Courses will be dynamically inserted here -->
+        <div class="content">
+            <h1>Available Courses</h1>
+
+            <div class="controls-container">
+                <button class="refresh-btn" onclick="fetchCourses()">Refresh Courses</button>
+            </div>
+
+            <div class="add-course-section" id="add-course-section"></div>
+
+            <div class="courses-container" id="courses-list"></div>
+
+            <div id="addCourseModal" class="modal">
+                <div class="modal-content">
+                    <span
+                        onclick="document.getElementById('addCourseModal').style.display='none'"
+                        style="float: right; cursor: pointer; font-size: 28px"
+                        >&times;</span
+                    >
+                    <h2>Create New Course</h2>
+                    <label for="courseCode">Course Code:</label>
+                    <input type="text" id="courseCode" name="courseCode" required /><br />
+
+                    <label for="courseName">Course Name:</label>
+                    <input type="text" id="courseName" name="courseName" required /><br />
+
+                    <label for="maxEnrollees">Max Enrollees:</label>
+                    <input type="number" id="maxEnrollees" name="maxEnrollees" min="1" required /><br />
+
+                    <button onclick="createCourse()">Create Course</button>
+                    <button class="close-btn" onclick="document.getElementById('addCourseModal').style.display='none'">
+                        Cancel
+                    </button>
+                </div>
+            </div>
         </div>
 
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 fetchCourses()
+                checkUserRoleAndAddButton()
+                displayUserInfo() // Call function to display user info
             })
 
+            let loggedInUserRole = null // Store the logged-in user's role
+
+            function displayUserInfo() {
+                const user = localStorage.getItem('user')
+                if (user) {
+                    const userData = JSON.parse(user)
+                    document.getElementById('user-name').textContent = `${userData.firstName} ${userData.lastName}` // Assuming you have these fields
+                    document.getElementById('user-role').textContent = userData.role
+                    document.getElementById('user-email').textContent = userData.email
+                } else {
+                    // Handle case where user info is not available (e.g., not logged in)
+                    document.getElementById('user-sidebar').style.display = 'none'
+                }
+            }
+
+            function checkUserRoleAndAddButton() {
+                const user = localStorage.getItem('user')
+                if (user) {
+                    const userData = JSON.parse(user)
+                    loggedInUserRole = userData.role // Set the global role variable
+                    if (userData && userData.role === 'faculty') {
+                        const addCourseSection = document.getElementById('add-course-section')
+                        const addButton = document.createElement('button')
+                        addButton.textContent = 'Add Course'
+                        addButton.className = 'add-course-btn'
+                        addButton.onclick = function () {
+                            document.getElementById('addCourseModal').style.display = 'block'
+                        }
+                        addCourseSection.appendChild(addButton)
+                    }
+                }
+            }
+
             function fetchCourses() {
-                fetch('http://localhost:8081/courses') // adjust to your endpoint
+                const user = localStorage.getItem('user')
+                if (!user) {
+                    window.location.href = '/login'
+                    return
+                }
+                const token = JSON.parse(user).token
+                fetch('http://localhost:8081/courses', {
+                    method: 'GET',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
                     .then((response) => response.json())
                     .then((data) => {
                         const list = document.getElementById('courses-list')
                         list.innerHTML = '' // Clear existing
-                        console.log(data)
+                        const userData = JSON.parse(localStorage.getItem('user')) // Get user data again for role check
 
                         data.forEach((course) => {
                             const div = document.createElement('div')
                             div.className = 'course'
 
+                            let enrollButtonHTML = ''
+                            if (userData && userData.role === 'student') {
+                                enrollButtonHTML = `<button class="enroll-btn" onclick="enroll('${course.id}')">Enroll</button>`
+                            }
+
                             div.innerHTML = `
-                            <div class="course-info">
-                                <strong>${course.code}: ${course.name}</strong><br>
-                                Faculty: ${course.faculty}<br>
-                                Enrolled: ${course.currentEnrollees}/${course.maxEnrollees}
-                            </div>
-                            <button class="enroll-btn" onclick="enroll('${course.id}')">Enroll</button>
-                        `
+                        <div class="course-info">
+                            <strong>${course.courseCode}: ${course.courseName}</strong><br>
+                            Faculty: ${course.facultyId}<br>
+                            Enrolled: ${course.currentEnrollees}/${course.maxEnrollees}
+                        </div>
+                        <div class="enroll-button-container">
+                            ${enrollButtonHTML}
+                        </div>
+                    `
 
                             list.appendChild(div)
                         })
                     })
+                    .catch((error) => console.error('Error fetching courses:', error))
             }
 
             function enroll(courseId) {
+                const user = localStorage.getItem('user')
+                if (!user || loggedInUserRole !== 'student') {
+                    alert('Only students can enroll in courses.')
+                    return
+                }
+                const token = JSON.parse(user).token
                 fetch(`http://localhost:8081/enrollment/${courseId}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
                     },
                 })
                     .then((res) => {
@@ -133,6 +394,55 @@
                         }
                     })
                     .catch((err) => alert('Error: ' + err))
+            }
+
+            function createCourse() {
+                const user = localStorage.getItem('user')
+                if (!user) {
+                    window.location.href = '/login'
+                    return
+                }
+                const token = JSON.parse(user).token
+                const userData = JSON.parse(user)
+                const facultyId = userData.id
+
+                const courseCode = document.getElementById('courseCode').value
+                const courseName = document.getElementById('courseName').value
+                const maxEnrollees = document.getElementById('maxEnrollees').value
+
+                if (!courseCode || !courseName || !maxEnrollees) {
+                    alert('Please fill in all course details.')
+                    return
+                }
+
+                const newCourse = {
+                    courseCode: courseCode,
+                    courseName: courseName,
+                    maxEnrollees: parseInt(maxEnrollees),
+                    facultyId: facultyId,
+                }
+
+                fetch('http://localhost:8081/courses/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify(newCourse),
+                })
+                    .then((response) => {
+                        if (response.ok) {
+                            alert('Course created successfully!')
+                            document.getElementById('addCourseModal').style.display = 'none'
+                            document.getElementById('courseCode').value = ''
+                            document.getElementById('courseName').value = ''
+                            document.getElementById('maxEnrollees').value = ''
+                            fetchCourses() // Refresh the course list
+                        } else {
+                            response.text().then((msg) => alert('Failed to create course: ' + msg))
+                        }
+                    })
+                    .catch((error) => console.error('Error creating course:', error))
             }
         </script>
     </body>
