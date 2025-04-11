@@ -42,12 +42,9 @@ implements EnrollmentService {
     }
 
     @Override
-    public EnrollmentDto deleteEnrollment(UUID facultyId, UUID enrollmentId) {
+    public EnrollmentDto deleteEnrollment(UUID enrollmentId) {
         Enrollment enrollment = enrollmentRepository.findById(enrollmentId).orElseThrow(()->new ResourceNotFoundException("Enrollment not found"));
-        User user = userRepository.findById(facultyId).orElseThrow(()->new ResourceNotFoundException("User not found"));
-        if (!Objects.equals(user.getRole(), "faculty")) {
-            throw new IllegalArgumentException("Only faculty can remove enrollments");
-        }
+
         enrollmentRepository.delete(enrollment);
         return null;
     }

@@ -1,17 +1,19 @@
 package com.garynation.stdiscm.problemset4.courseservice.service.impl;
 
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
 import com.garynation.stdiscm.problemset4.courseservice.dto.CourseDto;
 import com.garynation.stdiscm.problemset4.courseservice.entity.Course;
 import com.garynation.stdiscm.problemset4.courseservice.exception.ResourceNotFoundException;
 import com.garynation.stdiscm.problemset4.courseservice.mapper.CourseMapper;
 import com.garynation.stdiscm.problemset4.courseservice.repository.CourseRepository;
 import com.garynation.stdiscm.problemset4.courseservice.service.CourseService;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
@@ -48,6 +50,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public List<CourseDto> getAllCourses() {
         List<Course> courses = courseRepository.findAll();
+        
         return courses.stream().map(CourseMapper::mapToCourseDto).collect(Collectors.toList());
     }
 

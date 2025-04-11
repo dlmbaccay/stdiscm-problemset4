@@ -21,7 +21,7 @@ import io.swagger.v3.oas.annotations.Operation;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/api/enrollments")
+@RequestMapping("/api/enrollment")
 public class EnrollmentController {
     private EnrollmentService enrollmentService;
 
@@ -33,9 +33,9 @@ public class EnrollmentController {
     }
 
     @Operation(summary = "Delete enrollment")
-    @DeleteMapping("/{facultyId}/{id}")
-    public ResponseEntity<String> deleteEnrollment(@PathVariable("facultyId") UUID facultyId, @PathVariable("id") UUID enrollmentId) {
-        EnrollmentDto enrollment = enrollmentService.deleteEnrollment(facultyId, enrollmentId);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteEnrollment(@PathVariable("id") UUID enrollmentId) {
+        EnrollmentDto enrollment = enrollmentService.deleteEnrollment(enrollmentId);
         return ResponseEntity.ok("Enrollment deleted succesfully.");
     }
 

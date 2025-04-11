@@ -7,7 +7,7 @@ import com.garynation.stdiscm.problemset4.enrollmentservice.dto.EnrollmentDto;
 
 public interface EnrollmentService {
     EnrollmentDto addEnrollment(EnrollmentDto enrollmentDto);
-    EnrollmentDto deleteEnrollment(UUID facultyId, UUID enrollmentId);
+    EnrollmentDto deleteEnrollment(UUID enrollmentId);
     EnrollmentDto getEnrollmentById(UUID enrollmentId);
     List<EnrollmentDto> getAllEnrollments();
     List<EnrollmentDto> getEnrollmentsByCourseId(UUID courseId);

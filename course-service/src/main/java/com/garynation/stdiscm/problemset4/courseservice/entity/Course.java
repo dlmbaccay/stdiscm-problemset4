@@ -39,4 +39,5 @@ public class Course {
 
     @Column(name = "current_enrollees")
     private Integer currentEnrollees = 0;
+    
 }

@@ -33,8 +33,10 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
             String jwt = this.parseJwt(exchange.getRequest());
             try {
-                jwtUtil.validateJwtToken(jwt);
-
+                boolean isValid = jwtUtil.validateJwtToken(jwt);
+                if (!isValid) {
+                    return this.onError(exchange, HttpStatus.UNAUTHORIZED);
+                }
             } catch (Exception e) {
                 return this.onError(exchange, HttpStatus.UNAUTHORIZED);
             }
