@@ -36,6 +36,10 @@ public class ApiGatewayApplication {
                         .uri("http://grade-service:8085"))
                 .route("grade-service",r -> r.path("/grades/**").filters(f -> f.prefixPath("/api").filter(authenticationFilter.apply(new AuthenticationFilter.Config())))
                         .uri("http://grade-service:8085"))
+                .route("notification-service",r -> r.path("/notifications/v3/api-docs")
+                        .uri("http://notification-service:8086"))
+                .route("notification-service",r -> r.path("/notifications/**").filters(f -> f.prefixPath("/api").filter(authenticationFilter.apply(new AuthenticationFilter.Config())))
+                        .uri("http://notification-service:8086"))
                 .build();
     }
 }

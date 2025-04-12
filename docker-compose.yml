@@ -127,6 +127,21 @@ services:
             - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
             - SPRING_APPLICATION_NAME=grade-service
 
+    notification-service:
+        build: ./notification-service
+        container_name: notification-service
+        ports:
+            - '8086:8086'
+        depends_on:
+            - discovery-server
+            - enrollment-service
+        networks:
+            - stdiscm-network
+        environment:
+            - SPRING_PROFILES_ACTIVE=docker
+            - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
+            - SPRING_APPLICATION_NAME=notification-service
+
 volumes:
     db_data:
         name: stdiscm_db_data

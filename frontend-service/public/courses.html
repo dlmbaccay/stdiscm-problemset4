@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <title>Courses</title>
-        <link rel="stylesheet" href="../src/assets/style.css" />
+
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -241,13 +241,48 @@
             .enroll-btn + .enroll-btn:hover {
                 background-color: #117a8b;
             }
+
+            .logout-btn {
+                display: inline-block;
+                background-color: #ff0000;
+                color: white;
+                padding: 0.75rem 1.5rem;
+                border: none;
+                border-radius: 4px;
+                text-decoration: none;
+                cursor: pointer;
+            }
+
+            .nav-menu {
+                display: flex;
+                flex-direction: row;
+                gap: 1rem;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .notif-btn {
+                background-color: #ffc107;
+                border: none;
+                padding: 0.5rem 1rem;
+                font-size: 1rem;
+                border-radius: 4px;
+                cursor: pointer;
+                color: black;
+            }
+
+            .notif-btn:hover {
+                background-color: #e0a800;
+            }
         </style>
+        <link rel="stylesheet" href="../src/assets/mainStyle.css" />
     </head>
     <body>
         <header>
             <nav>
                 <div><strong>Garynation Enrollment</strong></div>
                 <div class="nav-menu">
+                    <button class="notif-btn" onclick="openNotificationModal()">🔔</button>
                     <a href="/public/courses.html" id="nav-all-courses">All Courses</a>
                     <a href="/public/my-courses.html" id="nav-my-courses">My Courses</a>
                     <a href="/public/my-grades.html" id="nav-my-grades">My Grades</a>
@@ -298,9 +333,23 @@
                     </button>
                 </div>
             </div>
+
+            <div id="notificationModal" class="modal">
+                <div class="modal-content">
+                    <span
+                        onclick="document.getElementById('notificationModal').style.display='none'"
+                        style="float: right; cursor: pointer; font-size: 28px"
+                        >&times;</span
+                    >
+                    <h2>Notifications</h2>
+                    <div id="notification-list">
+                        <!-- Notifications will be loaded here -->
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- replace existing inline script -->
+        <script type="module" src="../src/controllers/notificationController.js"></script>
         <script type="module" src="../src/controllers/coursesController.js"></script>
     </body>
 </html>
