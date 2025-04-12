@@ -57,7 +57,7 @@
                 left: 0;
                 height: 100vh; /* Full viewport height */
                 box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-                z-index: 99; /* Below the header but above main content */
+                z-index: 2; /* Below the header but above main content */
             }
 
             .sidebar h2 {
@@ -164,7 +164,7 @@
             .modal {
                 display: none;
                 position: fixed;
-                z-index: 1;
+                z-index: 5;
                 left: 0;
                 top: 0;
                 width: 100%;
@@ -284,7 +284,7 @@
             }
 
             .notif-btn {
-                background-color: #ffc107;
+                background-color: #fff;
                 border: none;
                 padding: 0.5rem 1rem;
                 font-size: 1rem;
@@ -303,6 +303,7 @@
             <nav>
                 <div><strong>Garynation Enrollment</strong></div>
                 <div class="nav-menu">
+                    <button class="notif-btn" onclick="openNotificationModal()">🔔</button>
                     <a href="/public/courses.html" id="nav-all-courses">All Courses</a>
                     <a href="/public/my-courses.html" id="nav-my-courses">My Courses</a>
                     <a href="/public/my-grades.html" id="nav-my-grades">My Grades</a>
@@ -334,6 +335,20 @@
 
             <div class="courses-container" id="grades-list">
                 <!-- Grade entries will be rendered here -->
+            </div>
+
+            <div id="notificationModal" class="modal">
+                <div class="modal-content">
+                    <span
+                        onclick="document.getElementById('notificationModal').style.display='none'"
+                        style="float: right; cursor: pointer; font-size: 28px"
+                        >&times;</span
+                    >
+                    <h2>Notifications</h2>
+                    <div id="notification-list">
+                        <!-- Notifications will be loaded here -->
+                    </div>
+                </div>
             </div>
         </div>
 

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.sql.Date;
 import java.util.UUID;
 
 @Getter
@@ -36,4 +37,7 @@ public class Notification {
 
     @Column(name = "is_read", nullable = true)
     private boolean isRead;
+
+    @Column(name = "created_at", nullable = true)
+    private Date createdAt;
 }

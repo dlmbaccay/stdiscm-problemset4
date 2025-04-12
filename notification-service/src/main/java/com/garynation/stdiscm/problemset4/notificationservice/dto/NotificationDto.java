@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.sql.Date;
 import java.util.UUID;
 
 @Getter
@@ -19,4 +20,5 @@ public class NotificationDto {
     private UUID courseId;
     private UUID actorId;
     private boolean isRead;
+    private Date createdAt;
 }

@@ -1,6 +1,7 @@
 import { getAllCourses, createCourse } from '../models/courseModel.js'
 import { getEnrollmentsByStudentId, enrollInCourse, dropCourse } from '../models/enrollModel.js'
 import { getGradesByStudentId } from '../models/gradeModel.js'
+import { getUserNotifications } from '../models/notificationModel.js'
 import { logout, refreshToken } from '../models/authModel.js'
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -92,39 +93,43 @@ async function fetchAndDisplayCoursesWithGrades() {
     }
 }
 
-window.createCourse = async function () {
-    const user = JSON.parse(localStorage.getItem('user'))
-    if (!user) return (window.location.href = '/public/login.html')
-
-    const courseCode = document.getElementById('courseCode').value
-    const courseName = document.getElementById('courseName').value
-    const maxEnrollees = document.getElementById('maxEnrollees').value
-
-    if (!courseCode || !courseName || !maxEnrollees) {
-        return alert('Please fill all fields.')
-    }
-
-    const newCourse = {
-        courseCode,
-        courseName,
-        maxEnrollees: parseInt(maxEnrollees),
-        facultyId: user.id,
-    }
-
-    try {
-        await createCourse(newCourse, user.token)
-        alert('Course created!')
-        document.getElementById('addCourseModal').style.display = 'none'
-        fetchAndDisplayCourses()
-    } catch (err) {
-        alert(`Failed to create course: ${err.message}`)
-    }
-}
-
 window.viewCourse = function (courseId) {
     window.location.href = `/public/course-view.html?id=${courseId}`
 }
 
 window.logout = function () {
     logout()
+}
+
+window.openNotificationModal = async function () {
+    const modal = document.getElementById('notificationModal')
+    const container = document.getElementById('notification-list')
+    container.innerHTML = '<p>Loading notifications...</p>'
+    modal.style.display = 'block'
+
+    const user = JSON.parse(localStorage.getItem('user'))
+    if (!user) return (container.innerHTML = '<p>You must be logged in.</p>')
+
+    try {
+        const notifications = await getUserNotifications(user.id, user.token)
+
+        if (notifications.length === 0) {
+            container.innerHTML = '<p>No notifications yet.</p>'
+            return
+        }
+
+        container.innerHTML = notifications
+            .map(
+                (n) => `
+            <div style="border-bottom: 1px solid #ccc; padding: 0.5rem 0;">
+                <p><strong>${n.type.replace('_', ' ')}</strong> — ${n.message}</p>
+                <small>${n.createdAt}</small>
+            </div>
+        `,
+            )
+            .join('')
+    } catch (err) {
+        console.error('Failed to fetch notifications:', err)
+        container.innerHTML = '<p>Error loading notifications.</p>'
+    }
 }

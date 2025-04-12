@@ -8,6 +8,7 @@ import {
 import { getUserById } from '../models/authModel.js'
 import { createGrade, updateGrade, getGradesByCourseIdAndStudentId, getGradesByCourseId } from '../models/gradeModel.js'
 import { logout, refreshToken } from '../models/authModel.js'
+import { getUserNotifications, createNotification } from '../models/notificationModel.js'
 
 const courseId = new URLSearchParams(window.location.search).get('id')
 const user = JSON.parse(localStorage.getItem('user'))
@@ -35,10 +36,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Show enroll/drop button if student
         if (user.role === 'student') {
-            await renderEnrollmentButton(course.id)
+            await renderEnrollmentButton(course)
         }
         if (user.role === 'faculty' && course.facultyId === user.id) {
-            await renderFacultyGradePanel(course.id)
+            await renderFacultyGradePanel(course)
         }
     } catch (err) {
         alert('Failed to load course: ' + err.message)
@@ -69,12 +70,12 @@ function displayUserInfo() {
     }
 }
 
-async function renderFacultyGradePanel(courseId) {
+async function renderFacultyGradePanel(course) {
     const gradesSection = document.getElementById('grades-section')
     gradesSection.innerHTML = '<h2>Manage Student Grades</h2>'
 
     try {
-        const grades = await getGradesByCourseId(courseId, user.token)
+        const grades = await getGradesByCourseId(course.id, user.token)
         if (!grades.length) {
             gradesSection.innerHTML += '<p>No students enrolled.</p>'
             return
@@ -86,6 +87,7 @@ async function renderFacultyGradePanel(courseId) {
         table.innerHTML = `
             <thead>
                 <tr>
+                    <th style="text-align:left; padding: 8px; border-bottom: 1px solid #ccc;">Student ID</th>
                     <th style="text-align:left; padding: 8px; border-bottom: 1px solid #ccc;">Student</th>
                     <th style="text-align:left; padding: 8px; border-bottom: 1px solid #ccc;">Grade</th>
                     <th style="padding: 8px; border-bottom: 1px solid #ccc;"></th>
@@ -96,7 +98,8 @@ async function renderFacultyGradePanel(courseId) {
                     .map(
                         (e) => `
                     <tr data-enrollment-id="${e.id}">
-                        <td style="padding: 8px;">${e.firstName} ${e.lastName}</td>
+                        <td style="padding: 8px;" data-student-id="${e.studentId}">${e.studentId}</td>
+                        <td style="padding: 8px;" data-student-id="${e.studentId}">${e.firstName} ${e.lastName}</td>
                         <td style="padding: 8px;">
                             <input type="text" value="${e.grade ?? ''}" style="width: 100px;" />
                         </td>
@@ -118,11 +121,12 @@ async function renderFacultyGradePanel(courseId) {
             button.addEventListener('click', (event) => {
                 const row = event.target.closest('tr')
                 const gradeId = row.getAttribute('data-enrollment-id')
+                const studentId = row.querySelector('td[data-student-id]').textContent
                 const gradeInput = row.querySelector('input').value
                 const gradeData = {
                     grade: gradeInput.trim(),
                 }
-                saveGrade(gradeId, gradeData, user.token)
+                saveGrade(course, studentId, gradeId, gradeData, user.token)
             })
         })
     } catch (err) {
@@ -130,11 +134,11 @@ async function renderFacultyGradePanel(courseId) {
     }
 }
 
-async function renderEnrollmentButton(courseId) {
+async function renderEnrollmentButton(course) {
     try {
         const enrollments = await getEnrollmentsByStudentId(user.id, user.token)
 
-        const enrollment = enrollments.find((e) => e.courseId === courseId)
+        const enrollment = enrollments.find((e) => e.courseId === course.id)
         const container = document.getElementById('action-button-container')
         container.innerHTML = ''
 
@@ -143,10 +147,10 @@ async function renderEnrollmentButton(courseId) {
 
         if (enrollment) {
             btn.textContent = 'Drop Course'
-            btn.onclick = () => drop(enrollment.id)
+            btn.onclick = () => drop(enrollment, course)
         } else {
             btn.textContent = 'Enroll'
-            btn.onclick = () => enroll(courseId)
+            btn.onclick = () => enroll(course)
         }
 
         container.appendChild(btn)
@@ -155,14 +159,21 @@ async function renderEnrollmentButton(courseId) {
     }
 }
 
-async function enroll(courseId) {
+async function enroll(course) {
     try {
         const requestData = {
-            courseId,
+            courseId: course.id,
             userId: user.id,
         }
         const res = await enrollInCourse(requestData, user.token)
-
+        const notificationData = {
+            type: 'ENROLL',
+            message: `${user.firstName} ${user.lastName} has enrolled in ${course.courseName}`,
+            recipientId: course.facultyId,
+            actorId: user.id,
+            read: false,
+        }
+        await createNotification(notificationData, user.token)
         if (!res) throw new Error('Enrollment failed')
 
         alert('Enrolled successfully!')
@@ -172,12 +183,21 @@ async function enroll(courseId) {
     }
 }
 
-async function saveGrade(gradeId, gradeData, token) {
+async function saveGrade(course, studentId, gradeId, gradeData, token) {
     try {
         if (gradeData.grade < 0 || gradeData.grade > 4) {
             throw new Error('Grade must be between 0 and 4')
         }
         const res = await updateGrade(gradeId, gradeData, token)
+        const notificationData = {
+            type: 'GRADE',
+            message: `${user.firstName} ${user.lastName} has updated your grade for ${course.courseName}`,
+            recipientId: studentId,
+            actorId: user.id,
+            read: false,
+        }
+        await createNotification(notificationData, user.token)
+
         if (!res) throw new Error('Failed to update grade')
         alert('Grade updated successfully!')
     } catch (err) {
@@ -185,10 +205,17 @@ async function saveGrade(gradeId, gradeData, token) {
     }
 }
 
-async function drop(enrollmentId) {
+async function drop(enrollment, course) {
     try {
-        const res = await dropCourse(enrollmentId, user.token)
-
+        const res = await dropCourse(enrollment.id, user.token)
+        const notificationData = {
+            type: 'DROP',
+            message: `${user.firstName} ${user.lastName} has dropped ${course.courseName}`,
+            recipientId: course.facultyId,
+            actorId: user.id,
+            read: false,
+        }
+        await createNotification(notificationData, user.token)
         if (!res) throw new Error('Drop failed')
         alert('Dropped successfully!')
         window.location.reload()
@@ -199,4 +226,37 @@ async function drop(enrollmentId) {
 
 window.logout = function () {
     logout()
+}
+
+window.openNotificationModal = async function () {
+    const modal = document.getElementById('notificationModal')
+    const container = document.getElementById('notification-list')
+    container.innerHTML = '<p>Loading notifications...</p>'
+    modal.style.display = 'block'
+
+    const user = JSON.parse(localStorage.getItem('user'))
+    if (!user) return (container.innerHTML = '<p>You must be logged in.</p>')
+
+    try {
+        const notifications = await getUserNotifications(user.id, user.token)
+
+        if (notifications.length === 0) {
+            container.innerHTML = '<p>No notifications yet.</p>'
+            return
+        }
+
+        container.innerHTML = notifications
+            .map(
+                (n) => `
+            <div style="border-bottom: 1px solid #ccc; padding: 0.5rem 0;">
+                <p><strong>${n.type.replace('_', ' ')}</strong> — ${n.message}</p>
+                <small>${n.createdAt}</small>
+            </div>
+        `,
+            )
+            .join('')
+    } catch (err) {
+        console.error('Failed to fetch notifications:', err)
+        container.innerHTML = '<p>Error loading notifications.</p>'
+    }
 }

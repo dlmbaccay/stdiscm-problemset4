@@ -262,8 +262,69 @@
                 justify-content: center;
             }
 
+            .modal {
+                display: none;
+                position: fixed;
+                z-index: 5;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                overflow: auto;
+                background-color: rgba(0, 0, 0, 0.4);
+            }
+
+            .modal-content {
+                background-color: #fefefe;
+                margin: 15% auto;
+                padding: 20px;
+                border: 1px solid #888;
+                width: 80%;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+            }
+
+            .modal-content label {
+                display: block;
+                margin-bottom: 0.5rem;
+                font-weight: bold;
+            }
+
+            .modal-content input[type='text'],
+            .modal-content input[type='number'] {
+                width: calc(100% - 12px);
+                padding: 8px;
+                margin-bottom: 1rem;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                box-sizing: border-box;
+            }
+
+            .modal-content button {
+                background-color: #007bff;
+                color: white;
+                border: none;
+                padding: 0.75rem 1.5rem;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 1rem;
+                margin-right: 0.5rem;
+            }
+
+            .modal-content button:hover {
+                background-color: #0056b3;
+            }
+
+            .modal-content .close-btn {
+                background-color: #dc3545;
+            }
+
+            .modal-content .close-btn:hover {
+                background-color: #c82333;
+            }
+
             .notif-btn {
-                background-color: #ffc107;
+                background-color: #fff;
                 border: none;
                 padding: 0.5rem 1rem;
                 font-size: 1rem;
@@ -282,6 +343,8 @@
             <nav>
                 <div><strong>Garynation Enrollment</strong></div>
                 <div class="nav-menu">
+                    <button class="notif-btn" onclick="openNotificationModal()">🔔</button>
+
                     <a href="/public/courses.html" id="nav-all-courses">All Courses</a>
                     <a href="/public/my-courses.html" id="nav-my-courses">My Courses</a>
                     <a href="/public/my-grades.html" id="nav-my-grades">My Grades</a>
@@ -330,6 +393,20 @@
                     <button class="close-btn" onclick="document.getElementById('addCourseModal').style.display='none'">
                         Cancel
                     </button>
+                </div>
+            </div>
+
+            <div id="notificationModal" class="modal">
+                <div class="modal-content">
+                    <span
+                        onclick="document.getElementById('notificationModal').style.display='none'"
+                        style="float: right; cursor: pointer; font-size: 28px"
+                        >&times;</span
+                    >
+                    <h2>Notifications</h2>
+                    <div id="notification-list">
+                        <!-- Notifications will be loaded here -->
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,7 +1,7 @@
 import { getAllCourses, createCourse, deleteCourse } from '../models/courseModel.js'
 import { getEnrollmentsByStudentId, enrollInCourse, dropCourse } from '../models/enrollModel.js'
 import { logout, refreshToken } from '../models/authModel.js'
-import { getUserNotifications } from '../models/notificationModel.js'
+import { getUserNotifications, createNotification } from '../models/notificationModel.js'
 
 document.addEventListener('DOMContentLoaded', () => {
     displayUserInfo()
@@ -87,6 +87,14 @@ async function fetchAndDisplayCourses() {
                     actionBtn.onclick = async () => {
                         try {
                             await dropCourse(enrollment.id, user.token)
+                            const notificationData = {
+                                type: 'DROP',
+                                message: `${user.firstName} ${user.lastName} has dropped ${course.courseName}`,
+                                recipientId: course.facultyId,
+                                actorId: user.id,
+                                read: false,
+                            }
+                            await createNotification(notificationData, user.token)
                             alert('Course dropped!')
                             fetchAndDisplayCourses()
                         } catch (err) {
@@ -98,6 +106,14 @@ async function fetchAndDisplayCourses() {
                     actionBtn.onclick = async () => {
                         try {
                             await enrollInCourse({ courseId: course.id, userId: user.id }, user.token)
+                            const notificationData = {
+                                type: 'ENROLL',
+                                message: `${user.firstName} ${user.lastName} has enrolled in ${course.courseName}`,
+                                recipientId: course.facultyId,
+                                actorId: user.id,
+                                read: false,
+                            }
+                            await createNotification(notificationData, user.token)
                             alert('Enrolled!')
                             fetchAndDisplayCourses()
                         } catch (err) {
@@ -207,7 +223,7 @@ window.openNotificationModal = async function () {
                 (n) => `
             <div style="border-bottom: 1px solid #ccc; padding: 0.5rem 0;">
                 <p><strong>${n.type.replace('_', ' ')}</strong> — ${n.message}</p>
-                <small>${new Date(n.created_at).toLocaleString()}</small>
+                <small>${n.createdAt}</small>
             </div>
         `,
             )

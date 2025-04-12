@@ -13,7 +13,8 @@ public class NotificationMapper {
                 notif.getMessage(),
                 notif.getCourseId(),
                 notif.getActorId(),
-                notif.isRead()
+                notif.isRead(),
+                notif.getCreatedAt()
         );
     }
 
@@ -25,7 +26,8 @@ public class NotificationMapper {
                 notifDto.getMessage(),
                 notifDto.getCourseId(),
                 notifDto.getActorId(),
-                notifDto.isRead()
+                notifDto.isRead(),
+                notifDto.getCreatedAt()
         );
     }
 }
